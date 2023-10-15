@@ -12,7 +12,7 @@ namespace WebApplication1.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string GetMyName()
+        public string GetName()
         {
             var result = string.Empty;
             if(_httpContextAccessor.HttpContext is not null)
@@ -22,6 +22,21 @@ namespace WebApplication1.Services
                 //result = _httpContextAccessor.HttpContext.User.FindAll(ClaimTypes.Role);
             }
             return result;
+        }
+        public int GetSpielerId()
+        {
+            var result = string.Empty;
+            if(_httpContextAccessor.HttpContext is not null)
+            {
+                //result = _httpContextAccessor.HttpContext.User?.Identity?.Name;
+                result = _httpContextAccessor.HttpContext.User.FindFirst("SpielerId")?.Value;
+                //result = _httpContextAccessor.HttpContext.User.FindAll(ClaimTypes.Role);
+            }
+            if (result is not null && result != string.Empty)
+            {
+                return int.Parse(result);
+            }
+            return 0;
         }
     }
 }

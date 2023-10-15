@@ -78,7 +78,8 @@ namespace SpielterminApi.Controllers
             List<Claim> claims = new List<Claim>
             {
                 //new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                new Claim(ClaimTypes.Name,user.Benutzername)
+                new Claim(ClaimTypes.Name,user.Benutzername),
+                new Claim("SpielerId",user.Id.ToString())
             };
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("JWT:Token").Value!));
             SigningCredentials cred = new SigningCredentials(key,SecurityAlgorithms.HmacSha512Signature);
@@ -99,7 +100,7 @@ namespace SpielterminApi.Controllers
         [HttpGet,Authorize]
         public ActionResult<string> GetMyName()
         {
-            return Ok(_userService.GetMyName());
+            return Ok(_userService.GetName());
         }   
     }
 }

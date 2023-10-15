@@ -39,7 +39,12 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
 });
 builder.Services.AddControllers();
 builder.Services.AddDbContext<SpielterminDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SpielterminDB")));  
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SpielterminDB")));
+
+//für Zugriff aus Android Studio
+builder.WebHost.UseUrls("http://0.0.0.0:7063");
+//builder.WebHost.UseUrls("https://0.0.0.0:7063");
+
 var app = builder.Build();
 app.UseSwaggerUI(c =>
 {
@@ -53,7 +58,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.MapControllers();
