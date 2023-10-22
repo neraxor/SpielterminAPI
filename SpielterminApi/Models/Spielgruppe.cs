@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace SpielterminApi.Models;
-
-public partial class Spielgruppe
+namespace SpielterminApi.Models
 {
-    public int Id { get; set; }
+    public class Spielgruppe
+    {
+        [Key]
+        public int ID { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public virtual ICollection<SpielgruppeSpieler> SpielgruppeSpieler { get; set; }
 
-    public int? SpielerId { get; set; }
-
-    public bool? WarGastgeber { get; set; }
-
-    public virtual ICollection<Nachricht> Nachrichts { get; set; } = new List<Nachricht>();
-
-    public virtual ICollection<Spielabstimmung> Spielabstimmungs { get; set; } = new List<Spielabstimmung>();
-
-    public virtual Spieler? Spieler { get; set; }
-
-    public virtual ICollection<Spieltermin> Spieltermins { get; set; } = new List<Spieltermin>();
-
-    public virtual ICollection<Spielvorschlag> Spielvorschlags { get; set; } = new List<Spielvorschlag>();
+    }
 }

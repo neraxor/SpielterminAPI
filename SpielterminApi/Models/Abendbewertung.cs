@@ -1,23 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace SpielterminApi.Models;
-
-public partial class Abendbewertung
+namespace SpielterminApi.Models
 {
-    public int Id { get; set; }
+    public class Abendbewertung
+    {
+        [Key]
+        public int ID { get; set; }
+        [Required]
+        public int AbendbewertungName { get; set; }
+        [Required]
+        public int Essensbewertung { get; set; }
+        [Required]
+        public int Gastgeberbewertung { get; set; }
 
-    public int? SpielterminId { get; set; }
+        [ForeignKey("Spieler")]
+        public int SpielerId { get; set; }
 
-    public int? SpielerId { get; set; }
+        [ForeignKey("Spieltermin")]
+        public int SpielterminId { get; set; }
 
-    public int? Gastgeberbewertung { get; set; }
-
-    public int? EssenBewertung { get; set; }
-
-    public int? AbendBewertung1 { get; set; }
-
-    public virtual Spieler? Spieler { get; set; }
-
-    public virtual Spieltermin? Spieltermin { get; set; }
+        [Required]
+        public virtual Spieler Spieler { get; set; }
+        [Required]
+        public virtual Spieltermin Spieltermin { get; set; }
+    }
 }

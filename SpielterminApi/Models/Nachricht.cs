@@ -1,21 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace SpielterminApi.Models;
-
-public partial class Nachricht
+namespace SpielterminApi.Models
 {
-    public int Id { get; set; }
+    public class Nachricht
+    {
+        [Key]
+        public int ID { get; set; }
+        [Required]
+        public string NachrichtText { get; set; }
+        [Required]
+        public  DateTime Uhrzeit { get; set; }
 
-    public int? AbsenderId { get; set; }
+        [ForeignKey("Spieler")]
+        public int AbsenderId { get; set; }
 
-    public int? SpielgruppeId { get; set; }
+        [ForeignKey("Spielgruppe")]
+        public int SpielgruppeId { get; set; }
 
-    public string? NachrichtText { get; set; }
-
-    public DateTime? Uhrzeit { get; set; }
-
-    public virtual Spieler? Absender { get; set; }
-
-    public virtual Spielgruppe? Spielgruppe { get; set; }
+        [Required]
+        public virtual Spieler Absender { get; set; }
+        [Required]
+        public virtual  Spielgruppe Spielgruppe { get; set; }
+    }
 }

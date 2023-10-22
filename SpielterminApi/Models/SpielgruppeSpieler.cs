@@ -3,19 +3,21 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SpielterminApi.Models
 {
-    public class Spielvorschlag
+    public class SpielgruppeSpieler
     {
         [Key]
         public int ID { get; set; }
-        [Required]
-        public string SpielvorschlagName { get; set; }
 
-        [ForeignKey("Spieltermin")]
-        public int SpielterminId { get; set; }
+        [ForeignKey("Spielgruppe")]
+        public int SpielgruppeId { get; set; }
 
         [ForeignKey("Spieler")]
         public int SpielerId { get; set; }
         [Required]
+        public bool WarGastgeber { get; set; }
+        [Required]
         public virtual Spieler Spieler { get; set; }
+        [Required]
+        public virtual Spielgruppe Spielgruppe { get; set; }
     }
 }

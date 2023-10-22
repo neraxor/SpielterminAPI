@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace SpielterminApi.Models;
-
-public partial class Spieltermin
+namespace SpielterminApi.Models
 {
-    public int Id { get; set; }
+    public class Spieltermin
+    {
+        [Key]
+        public int ID { get; set; }
+        [Required]
+        public DateTime Termin { get; set; }
 
-    public DateTime? Termin { get; set; }
+        [ForeignKey("Spielgruppe")]
+        public int SpielgruppeId { get; set; }
 
-    public int? SpielgruppeId { get; set; }
+        [ForeignKey("Spieler")]
+        public int GastgeberId { get; set; }
 
-    public int? GastgeberId { get; set; }
-
-    public virtual ICollection<Abendbewertung> Abendbewertungs { get; set; } = new List<Abendbewertung>();
-
-    public virtual Spieler? Gastgeber { get; set; }
-
-    public virtual Spielgruppe? Spielgruppe { get; set; }
-
-    public virtual ICollection<Spielvorschlag> Spielvorschlags { get; set; } = new List<Spielvorschlag>();
+        [Required]
+        public virtual Spielgruppe Spielgruppe { get; set; }
+    }
 }

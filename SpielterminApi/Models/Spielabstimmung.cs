@@ -1,23 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace SpielterminApi.Models;
-
-public partial class Spielabstimmung
+namespace SpielterminApi.Models
 {
-    public int Id { get; set; }
+    public class Spielabstimmung
+    {
+        [Key]
+        public int ID { get; set; }
+        [Required]
+        public bool Zustimmung { get; set; }
 
-    public int? SpielvorschlagId { get; set; }
+        [ForeignKey("Spielgruppe")]
+        public int SpielgruppeId { get; set; }
 
-    public int? SpielerId { get; set; }
+        [ForeignKey("Spielvorschlag")]
+        public int SpielvorschlagId { get; set; }
 
-    public bool? Zustimmung { get; set; }
-
-    public int? SpielgruppeId { get; set; }
-
-    public virtual Spieler? Spieler { get; set; }
-
-    public virtual Spielgruppe? Spielgruppe { get; set; }
-
-    public virtual Spielvorschlag? Spielvorschlag { get; set; }
+        [Required]
+        public virtual Spielgruppe Spielgruppe { get; set; }
+        [Required]
+        public virtual Spielvorschlag Spielvorschlag { get; set; }
+    }
 }
