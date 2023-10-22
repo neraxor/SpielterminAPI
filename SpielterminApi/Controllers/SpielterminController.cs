@@ -58,10 +58,6 @@ namespace SpielterminApi.Controllers
         public async Task<ActionResult<IEnumerable<Spieltermin>>> GetSpieltermineByGruppe(bool filterByDate = false, int SpielgruppenId = 0)
         {
             int SpielerId = _userService.GetSpielerId();
-                //var Spielgruppen = await _context.SpielgruppeSpieler
-                //.Where(x => x.SpielerId == SpielerId && x.SpielgruppeId == SpielgruppenId)
-                //.Select(x => x.ID)
-                //.ToListAsync();
             var spielgruppeSpieler = await _context.SpielgruppeSpieler
                 .FirstOrDefaultAsync(x => x.SpielerId == SpielerId && x.SpielgruppeId == SpielgruppenId);
 
@@ -109,11 +105,13 @@ namespace SpielterminApi.Controllers
                 var gastgeber = await _context.Spieler.FirstOrDefaultAsync(x => x.ID == spieltermin.GastgeberId);
                 if (gastgeber != null)
                 {
-                    var gastgeberAdresse = new SpielerDto();
-                    gastgeberAdresse.Wohnort = gastgeber.Wohnort;
-                    gastgeberAdresse.PLZ = gastgeber.PLZ;
-                    gastgeberAdresse.Straße = gastgeber.Straße;
-                    gastgeberAdresse.Hausnummer = gastgeber.Hausnummer;
+                    var gastgeberAdresse = new SpielerDto
+                    {
+                        Wohnort = gastgeber.Wohnort,
+                        PLZ = gastgeber.PLZ,
+                        Straße = gastgeber.Straße,
+                        Hausnummer = gastgeber.Hausnummer
+                    };
                     //var Adresse = spieler.Wohnort + " " + spieler.PLZ + " " + spieler.Straße + " " + spieler.Hausnummer;  
                     return gastgeberAdresse;
                 }
@@ -160,7 +158,13 @@ namespace SpielterminApi.Controllers
 
             if (await _context.SaveChangesAsync() > 0)
             {
-                return Ok(spieltermin);
+                var spielterminResponse = new SpielterminDto
+                {
+                    Termin = spieltermin.Termin,
+                    SpielgruppeId = spieltermin.SpielgruppeId,
+                    GastgeberId = spieltermin.GastgeberId
+                };
+                return Ok(spielterminResponse);
             }
 
             return BadRequest("Spieltermin konnte nicht gespeichert werden.");

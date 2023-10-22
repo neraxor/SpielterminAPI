@@ -7,15 +7,16 @@ namespace SpielterminApi.Models
     {
         [Key]
         public int ID { get; set; }
-        [Required]
-        public string Essensrichtung { get; set; }
+        [ForeignKey("Essensrichtung")]
+        public int EssensrichtungId { get; set; }
 
         [ForeignKey("Spieler")]
         public int SpielerId { get; set; }
 
         [ForeignKey("Spieltermin")]
         public int SpielterminId { get; set; }
-
+        [Required]
+        public virtual Essensrichtung Essensrichtung { get; set; } 
         [Required]
         public virtual Spieler Spieler { get; set; }
         [Required]

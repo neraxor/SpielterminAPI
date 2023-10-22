@@ -49,29 +49,38 @@ namespace SpielterminApi.Controllers
                 _context.Spieler.Add(user);
                 if (_context.SaveChanges() > 0)
                 {
-                    return Ok(user);
+                    var userResponse = new SpielerDto
+                    {
+                        Username = user.Benutzername,
+                        Vorname = user.Vorname,
+                        Nachname = user.Nachname,
+                        Wohnort = user.Wohnort,
+                        Straße = user.Straße,
+                        Hausnummer = user.Hausnummer,
+                        PLZ = user.PLZ
+                    };
+                    return Ok(userResponse);
                 }
             }
             else
             {
-                return BadRequest("User already exists");
+                return BadRequest("Benutzer existiert bereits");
             }
-            return BadRequest("User could not be saved");
+            return BadRequest("Benutzer konnte nicht gespeichert werden");
 
         }
         [HttpPost("login")]
         public ActionResult<Spieler> Login(SpielerDto request)
         {
-            //db abfrage ob user existiert && halt daten stimmen also user.benutzername hier macht keinen sinn und ist null
             Spieler? user = _context.Spieler.FirstOrDefault(s => s.Benutzername == request.Username);
 
             if (user is null)
             {
-                return BadRequest("User not found.");
+                return BadRequest("Benutzer wurde nicht gefunden");
             }
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-                return BadRequest("Password is incorrect.");
+                return BadRequest("Passwort ist falsch");
             }
             string token = CreateToken(user);
             return Ok(token);
@@ -80,7 +89,6 @@ namespace SpielterminApi.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                //new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
                 new Claim(ClaimTypes.Name,user.Benutzername),
                 new Claim("SpielerId",user.ID.ToString())
             };
@@ -98,10 +106,5 @@ namespace SpielterminApi.Controllers
 
             return jwt;
         }
-        //[HttpGet, Authorize]
-        //public ActionResult<string> GetMyName()
-        //{
-        //    return Ok(_userService.GetName());
-        //}
     }
 }

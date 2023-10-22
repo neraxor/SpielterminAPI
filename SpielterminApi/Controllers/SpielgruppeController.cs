@@ -87,7 +87,7 @@ namespace SpielterminApi.Controllers
             var user = _context.Spieler.FirstOrDefault(x => x.Benutzername.ToLower() == username.ToLower());
             if (user == null)
             {
-                return BadRequest("User not found.");
+                return BadRequest("Benutzer wurde nicht gefunden");
             }
             var spielgruppeSpieler = new SpielgruppeSpieler
             {
@@ -104,7 +104,6 @@ namespace SpielterminApi.Controllers
                 SpielerId = spielgruppeSpieler.SpielerId,
                 WarGastgeber = spielgruppeSpieler.WarGastgeber
             };
-            //todo muss ich hier responsen? dto muss sein weil sonst cycle
             return Ok(responseDto);
         }
 

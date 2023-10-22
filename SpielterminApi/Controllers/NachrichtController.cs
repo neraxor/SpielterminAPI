@@ -1,51 +1,104 @@
-﻿//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using SpielterminApi.Models;
-//using WebApplication1.Services;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SpielterminApi.Models;
+using WebApplication1.Services;
 
-//namespace SpielterminApi.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class NachrichtController : ControllerBase
-//    {
-//        private readonly SpielterminDbContext _context;
-//        private readonly ISpielerService _userService;
+namespace SpielterminApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class NachrichtController : ControllerBase
+    {
+        private readonly SpielterminDbContext _context;
+        private readonly ISpielerService _userService;
 
-//        public NachrichtController(SpielterminDbContext context, ISpielerService userService)
-//        {
-//            _context = context;
-//            _userService = userService;
-//        }
+        public NachrichtController(SpielterminDbContext context, ISpielerService userService)
+        {
+            _context = context;
+            _userService = userService;
+        }
 
-//        [HttpPost("create-nachricht"), Authorize]
-//        public async Task<ActionResult<Nachricht>> CreateNachricht(NachrichtDto request)
-//        {
-//            var nachrichtExists = _context.Nachrichten.Any(n => n.AbsenderId == request.AbsenderId && n.SpielgruppeId == request.SpielgruppeId && n.NachrichtText == request.NachrichtText);
+        /// <summary>
+        /// Erzeugt eine neue Nachricht. Keine doppelten Nachrichten möglich.
+        /// </summary>
+        /// <param name="request">Benötigt SpielgruppenId und einen Nachrichtentext</param>
+        /// <returns></returns>
+        [HttpPost("create-nachricht"), Authorize]
+        public async Task<ActionResult<Nachricht>> CreateNachricht(NachrichtDto request)
+        {
+            int SpielerId = _userService.GetSpielerId();
+            var nachrichtExists = _context.Nachrichten.Any(n => n.AbsenderId == SpielerId && n.SpielgruppeId == request.SpielgruppeId && n.NachrichtText == request.NachrichtText);
 
-//            if (nachrichtExists)
-//            {
-//                return BadRequest("Nachricht existiert bereits");
-//            }
+            if (nachrichtExists)
+            {
+                return BadRequest("Nachricht existiert bereits");
+            }
+            var isSpielerInSpielgruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == request.SpielgruppeId && x.SpielerId == SpielerId);
+            if (!isSpielerInSpielgruppe)
+            {
+                return Unauthorized("Sie sind nicht in der Spielgruppe für diese Nachrichten");
+            }
+            var nachricht = new Nachricht
+            {
+                AbsenderId = SpielerId,
+                SpielgruppeId = request.SpielgruppeId,
+                NachrichtText = request.NachrichtText,
+                Uhrzeit = DateTime.Now 
+            };
+            _context.Nachrichten.Add(nachricht);
 
-//            var nachricht = new Nachricht
-//            {
-//                AbsenderId = request.AbsenderId,
-//                SpielgruppeId = request.SpielgruppeId,
-//                NachrichtText = request.NachrichtText,
-//                Uhrzeit =  DateTime.Now // Standardmäßig auf aktuelle Uhrzeit setzen, wenn keine Uhrzeit angegeben ist
-//                //Uhrzeit = request.Uhrzeit ?? DateTime.Now // Standardmäßig auf aktuelle Uhrzeit setzen, wenn keine Uhrzeit angegeben ist
-//            };
-//            // TODO: Überprüfen, ob FK existieren (Absender, Spielgruppe)
-//            _context.Nachrichten.Add(nachricht);
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                var nachrichtResponse = new NachrichtDto
+                {
+                    AbsenderId = nachricht.AbsenderId,
+                    SpielgruppeId = nachricht.SpielgruppeId,
+                    NachrichtText = nachricht.NachrichtText,
+                    Uhrzeit = nachricht.Uhrzeit
+                };
+                return Ok(nachrichtResponse);
+            }
 
-//            if (await _context.SaveChangesAsync() > 0)
-//            {
-//                return Ok(nachricht);
-//            }
+            return BadRequest("Nachricht konnte nicht gespeichert werden");
+        }
+        /// <summary>
+        /// Liefert alle Nachrichten einer Spielgruppe absteigend sortiert nach Uhrzeit
+        /// </summary>
+        /// <param name="spielgruppeId">Benötigt Spielergruppe</param>
+        /// <param name="anzahlNachrichten">Wenn limitANzahl true dann ist das hier die Anzahl an Nachrichten</param>
+        /// <param name="limitAnzahl">Gibt an ob alle Nachrichten oder nur eine begrenzte Anzahl returned werden</param>
+        /// <returns></returns>
+        [HttpGet("get-nachrichten"), Authorize]
+        public async Task<ActionResult<IEnumerable<NachrichtDto>>> GetNachrichten(int spielgruppeId,int anzahlNachrichten = 10, bool limitAnzahl = false)
+        {
+            int SpielerId = _userService.GetSpielerId();
 
-//            return BadRequest("Nachricht konnte nicht gespeichert werden.");
-//        }
-//    }
-//}
+            var isSpielerInSpielgruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == spielgruppeId && x.SpielerId == SpielerId);
+            if (!isSpielerInSpielgruppe)
+            {
+                return Unauthorized("Sie sind nicht in der Spielgruppe für diese Nachrichten");
+            }
+            var nachrichten = new List<Nachricht>();
+            if (limitAnzahl)
+            {
+                nachrichten = await _context.Nachrichten.Where(n => n.SpielgruppeId == spielgruppeId).OrderByDescending(n => n.Uhrzeit).Take(anzahlNachrichten).ToListAsync();
+            }
+            else
+            {
+                nachrichten = await _context.Nachrichten.Where(n => n.SpielgruppeId == spielgruppeId).OrderByDescending(n => n.Uhrzeit).ToListAsync();
+            }
+
+            var nachrichtenResponse = nachrichten.Select(n => new NachrichtDto
+            {
+                ID = n.ID,
+                AbsenderId = n.AbsenderId,
+                SpielgruppeId = n.SpielgruppeId,
+                NachrichtText = n.NachrichtText,
+                Uhrzeit = n.Uhrzeit
+            }).ToList();
+            return Ok(nachrichtenResponse);
+        }
+    }
+}

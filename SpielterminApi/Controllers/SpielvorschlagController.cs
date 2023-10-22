@@ -1,48 +1,62 @@
-﻿//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using SpielterminApi.Models;
-//using WebApplication1.Services;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SpielterminApi.Models;
+using WebApplication1.Services;
 
-//namespace SpielterminApi.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class SpielvorschlagController : ControllerBase
-//    {
-//        private readonly SpielterminDbContext _context;
-//        private readonly ISpielerService _userService;
+namespace SpielterminApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SpielvorschlagController : ControllerBase
+    {
+        private readonly SpielterminDbContext _context;
+        private readonly ISpielerService _userService;
 
-//        public SpielvorschlagController(SpielterminDbContext context, ISpielerService userService)
-//        {
-//            _context = context;
-//            _userService = userService;
-//        }
+        public SpielvorschlagController(SpielterminDbContext context, ISpielerService userService)
+        {
+            _context = context;
+            _userService = userService;
+        }
 
-//        [HttpPost("create-spielvorschlag"),Authorize]       
-//        public async Task<ActionResult<Spielvorschlag>> CreateSpielvorschlag(SpielvorschlagDto request)
-//        {
-//            var spielvorschlagExists = _context.Spielvorschlaege.Any(s => s.TerminId == request.TerminId && s.Spielvorschlag1 == request.Spielvorschlag1);
-//            if (spielvorschlagExists)
-//            {
-//                return BadRequest("Spielvorschlag already exists");
-//            }
-//            //todo checken of FK existieren (termin, spielgruppe, spieler)
-//            var spielvorschlag = new Spielvorschlag
-//            {
-//                TerminId = request.TerminId,
-//                SpielgruppeId = request.SpielgruppeId,
-//                SpielerId = request.SpielerId,
-//                Spielvorschlag1 = request.Spielvorschlag1
-//            };
-//            _context.Spielvorschlaege.Add(spielvorschlag);
-//            if (await _context.SaveChangesAsync() > 0)
-//            {
-//                return Ok(spielvorschlag); 
-//            }
-//            return BadRequest("Spielvorschlag could not be saved.");
-//        }
+        /// <summary>
+        /// Fügt einen neuen Spielvorschlag hinzu. Spieler muss in der Spielgruppe des Spieltermins sein. Keine doppelten Spielvorschläge möglich.
+        /// </summary>
+        /// <param name="request">Spieltermin muss gegeben werden</param>
+        /// <returns></returns>
+        [HttpPost("create-spielvorschlag"), Authorize]
+        public async Task<ActionResult<Spielvorschlag>> CreateSpielvorschlag(SpielvorschlagDto request)
+        {
+            int SpielerId = _userService.GetSpielerId();
+            var spielvorschlagExists = _context.Spielvorschlaege.Any(x => x.SpielterminId == request.SpielterminId && x.SpielvorschlagName == request.SpielvorschlagName);
+            if (spielvorschlagExists)
+            {
+                return BadRequest("Spielvorschlag existiert bereits");
+            }
+            var spieltermin = await _context.Spieltermine.Include(x => x.Spielgruppe).ThenInclude(x => x.SpielgruppeSpieler).FirstOrDefaultAsync(x => x.ID == request.SpielterminId);
 
-
-//    }
-//}
+            if (spieltermin == null)
+            {
+                return BadRequest("Spieltermin existiert nicht");
+            }
+            var spielerInGruppe = spieltermin.Spielgruppe.SpielgruppeSpieler.Any(x => x.SpielerId == SpielerId);
+            if (!spielerInGruppe)
+            {
+                return Unauthorized("Spieler ist nicht in der Spielgruppe des Spieltermins");
+            }
+            var spielvorschlag = new Spielvorschlag
+            {
+                SpielterminId = request.SpielterminId,
+                SpielerId = SpielerId,
+                SpielvorschlagName = request.SpielvorschlagName
+            };
+            _context.Spielvorschlaege.Add(spielvorschlag);
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Ok(spielvorschlag);
+            }
+            return BadRequest("Spielvorschlag konnte nicht gespeichert werden");
+        }
+    }
+}

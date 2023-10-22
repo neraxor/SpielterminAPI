@@ -19,5 +19,16 @@ namespace SpielterminApi.Models
         public DbSet<Nachricht> Nachrichten { get; set; }
         public DbSet<Essensabstimmung> Essensabstimmungen { get; set; }
         public DbSet<Essensrichtung> Essensrichtungen { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Deaktivieren des kaskadierenden Löschens für die Beziehung zwischen Spieler und Spielabstimmung
+            modelBuilder.Entity<Spielabstimmung>()
+                .HasOne(sa => sa.Spieler)
+                .WithMany()
+                .HasForeignKey(sa => sa.SpielerId)
+                .OnDelete(DeleteBehavior.Restrict); // Kaskadierendes Löschen deaktivieren wegen Zirkelreferenz
+        }
+
     }
 }

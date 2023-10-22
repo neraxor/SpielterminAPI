@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SpielterminApi.Models;
 
@@ -11,9 +12,11 @@ using SpielterminApi.Models;
 namespace SpielterminApi.Migrations
 {
     [DbContext(typeof(SpielterminDbContext))]
-    partial class SpielterminDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231022090417_SpielerAddedToSpielabstimmung")]
+    partial class SpielerAddedToSpielabstimmung
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,8 +65,9 @@ namespace SpielterminApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("EssensrichtungId")
-                        .HasColumnType("int");
+                    b.Property<string>("Essensrichtung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SpielerId")
                         .HasColumnType("int");
@@ -72,8 +76,6 @@ namespace SpielterminApi.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("EssensrichtungId");
 
                     b.HasIndex("SpielerId");
 
@@ -318,12 +320,6 @@ namespace SpielterminApi.Migrations
 
             modelBuilder.Entity("SpielterminApi.Models.Essensabstimmung", b =>
                 {
-                    b.HasOne("SpielterminApi.Models.Essensrichtung", "Essensrichtung")
-                        .WithMany()
-                        .HasForeignKey("EssensrichtungId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SpielterminApi.Models.Spieler", "Spieler")
                         .WithMany()
                         .HasForeignKey("SpielerId")
@@ -335,8 +331,6 @@ namespace SpielterminApi.Migrations
                         .HasForeignKey("SpielterminId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Essensrichtung");
 
                     b.Navigation("Spieler");
 
