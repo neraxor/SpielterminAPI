@@ -42,7 +42,7 @@ namespace SpielterminApi.Controllers
             var isSpielerInSpielgruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == request.SpielgruppeId && x.SpielerId == SpielerId);
             if (!isSpielerInSpielgruppe)
             {
-                return Unauthorized("Sie sind nicht in der Spielgruppe für diesen Spieltermin");
+                return Unauthorized("Benutzer ist nicht in der Spielgruppe für diesen Spieltermin");
             }
             var spielabstimmung = new Spielabstimmung
             {

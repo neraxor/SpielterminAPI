@@ -2,7 +2,6 @@
 {
     public interface ISpielerService
     {
-        string GetName();
         public int GetSpielerId();
     }
 }

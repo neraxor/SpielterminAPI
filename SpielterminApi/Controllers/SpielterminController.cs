@@ -80,6 +80,7 @@ namespace SpielterminApi.Controllers
             }
             return BadRequest("Keine Spielgruppe für deinen Nutzer gefunden.");
         }
+
         /// <summary>
         /// Gibt die Adresse des Gastgebers für einen Spieltermin zurück. Spieler muss jedoch in der Spielegruppe des Termins sein.
         /// </summary>
