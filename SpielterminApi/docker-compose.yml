@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  myapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:7063"
+    depends_on:
+      - db
+  db:
+    image: "mcr.microsoft.com/mssql/server"
+    environment:
+      SA_PASSWORD: "Ex@mpl3Pass"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "3214:1433"      
