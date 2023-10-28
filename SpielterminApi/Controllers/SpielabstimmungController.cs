@@ -23,7 +23,7 @@ namespace SpielterminApi.Controllers
         /// <summary>
         /// Lässt den Benutzer über einen Spielvorschlag abstimmen. Keine doppelten Abstimmungen möglich.
         /// </summary>
-        /// <param name="request">SpielerId,SpielgruppeId benötigt</param>
+        /// <param name="request">SpielvorschlagId,SpielgruppeId benötigt</param>
         /// <returns></returns>
         [HttpPost("create-spielabstimmung"), Authorize]
         public async Task<ActionResult<Spielabstimmung>> CreateSpielabstimmung(SpielabstimmungDto request)
@@ -34,7 +34,7 @@ namespace SpielterminApi.Controllers
             {
                 return BadRequest("Spielvorschlag existiert nicht");
             }
-            var abstimmungExists = _context.Spielabstimmungen.Any(x => x.ID == request.SpielvorschlagId && x.SpielvorschlagId == request.SpielerId && x.SpielgruppeId == request.SpielgruppeId);
+            var abstimmungExists = _context.Spielabstimmungen.Any(x => x.ID == request.SpielvorschlagId && x.SpielvorschlagId == SpielerId && x.SpielgruppeId == request.SpielgruppeId);
             if (abstimmungExists)
             {
                 return BadRequest("Benutzer hat bereits abgestimmt");
@@ -47,7 +47,7 @@ namespace SpielterminApi.Controllers
             var spielabstimmung = new Spielabstimmung
             {
                 SpielvorschlagId = request.SpielvorschlagId,
-                SpielerId = request.SpielerId,
+                SpielerId = SpielerId,
                 Zustimmung = request.Zustimmung,
                 SpielgruppeId = request.SpielgruppeId
             };
