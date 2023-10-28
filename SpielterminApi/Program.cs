@@ -24,8 +24,12 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
-});
-builder.Services.AddAuthentication().AddJwtBearer(options =>
+}); 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -36,6 +40,7 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
         builder.Configuration.GetSection("JWT:Token").Value!))
     };
 });
+
 builder.Services.AddControllers();
 builder.Services.AddDbContext<SpielterminDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SpielterminDB")));
