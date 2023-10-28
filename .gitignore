@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/SpielterminApi/appsettings.json
+/SpielterminApi/appsettings.json
+/SpielterminApi/Controllers/AuthController.cs
+/SpielterminApi/appsettings.json
