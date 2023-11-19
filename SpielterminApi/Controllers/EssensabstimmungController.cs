@@ -26,7 +26,7 @@ namespace SpielterminApi.Controllers
         /// </summary>
         /// <param name="request">benötigt SpielterminId und EssensrichtungId</param>
         /// <returns></returns>
-        [HttpPost("Esssenabstimmen"), Authorize]
+        [HttpPost("Essenabstimmen"), Authorize]
         public async Task<ActionResult<EssensabstimmungDto>> Esssenabstimmen(EssensabstimmungDto request)
         {
             int SpielerId = _userService.GetSpielerId();
