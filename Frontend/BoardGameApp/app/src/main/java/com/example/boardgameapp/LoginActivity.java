@@ -60,7 +60,9 @@ public class LoginActivity extends AppCompatActivity {
         if (username.isEmpty() || password.isEmpty()) {
             Log.d("Login", "Username or password is empty");
         } else {
-            PostLogin(username, password);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            //TODO: entkemmentieren PostLogin(username, password);
         }
     }
 
