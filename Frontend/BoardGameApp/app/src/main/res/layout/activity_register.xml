@@ -18,6 +18,7 @@
               android:background="@color/beige"
               android:hint="Password"
               android:textColor="@color/black"
+              android:inputType="textPassword"
               android:layout_marginBottom="16dp"
     />
     <EditText android:layout_width="300dp"
