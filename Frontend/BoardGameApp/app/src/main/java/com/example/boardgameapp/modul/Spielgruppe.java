@@ -1,4 +1,4 @@
-package com.example.boardgameapp;
+package com.example.boardgameapp.modul;
 
 import java.util.List;
 
@@ -12,6 +12,7 @@ public class Spielgruppe {
     private String Gastgeber;
     private String GastgeberOrt;
     private String GastgeberPLZ;
+
     private String GastgeberStrasse;
     private String GastgeberHausnummer;
 

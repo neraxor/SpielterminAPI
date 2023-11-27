@@ -46,8 +46,9 @@
         <EditText android:layout_width="150dp"
                   android:layout_height="wrap_content"
                   android:background="@color/beige"
-                  android:hint="Wohnort"
+                  android:hint="Strasse"
                   android:textColor="@color/black"
+                  android:layout_marginTop="10dp"
                   android:layout_marginBottom="16dp"
                   android:layout_marginEnd="16dp"
         />
@@ -56,7 +57,9 @@
                   android:background="@color/beige"
                   android:hint="H.-Nr."
                   android:textColor="@color/black"
+                  android:layout_marginTop="10dp"
                   android:layout_marginBottom="16dp"
+                  android:inputType="numberDecimal"
         />
 
     </LinearLayout>
