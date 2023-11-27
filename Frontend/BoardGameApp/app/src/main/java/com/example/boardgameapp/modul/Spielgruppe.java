@@ -6,6 +6,8 @@ import java.util.List;
 public class Spielgruppe {
     private String name;
     private String id;
+
+
     private List<String> Spielvorschläge;
     private List<String> Essensvorschläge;
     private List<String> Teilnehmer;
@@ -15,6 +17,9 @@ public class Spielgruppe {
 
     private String GastgeberStrasse;
     private String GastgeberHausnummer;
+
+    public Spielgruppe() {
+    }
 
     public String getName() {
         return name;
