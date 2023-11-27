@@ -16,7 +16,7 @@
             android:theme="@style/Theme.BoardGameApp"
             tools:targetApi="31">
         <activity
-
+                android:name=".Profil"
                 android:exported="false"/>
         <activity
                 android:name=".CreatGroup"

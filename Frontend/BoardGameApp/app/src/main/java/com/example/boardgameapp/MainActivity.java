@@ -20,25 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        //Get
-        //GetBewertungenByGruppe(1);
-        //GetBewertungenByTermin(1);
-        //GetSiegerEssensrichtung(1);
-        //Esseensrichtung();
-        //GetNachrichten(1,5,true);
-        //GetSpielgruppe();
-        //GetSpieltermineBySpieler(true);
-        //GetSpieltermineByGruppe(true,1);
-        //Post aufrufe
-        //Essensabstimmen(1,1);
-        //CreateNachricht(1,"Test");
-        //CreateSpielabstimmung(1,1,1));
-        //CreateSpielgruppe("Test");
-        //AddSpielerToSpielgruppe("1003",2);
-        //CreateSpieltermin(1, new Date());
-        //CreateSpielvorschlag(1,"Test");
+        appNavigation();
     }
 
     private void appNavigation(){
