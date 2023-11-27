@@ -26,6 +26,7 @@ android:background="@color/tan">
             android:layout_centerHorizontal="true"
     />
     <EditText
+            android:id="@+id/joinGroupText"
             android:layout_width="200dp"
             android:layout_height="30dp"
             android:background="@color/wheat"
@@ -35,6 +36,7 @@ android:background="@color/tan">
             android:layout_centerHorizontal="true"
     />
     <Button
+            android:id="@+id/joinGroup"
             android:layout_width="100dp"
             android:layout_height="40dp"
             android:backgroundTint="@color/wheat"
@@ -54,6 +56,7 @@ android:background="@color/tan">
             android:layout_centerHorizontal="true"
     />
     <EditText
+            android:id="@+id/groupName"
             android:layout_width="200dp"
             android:layout_height="30dp"
             android:background="@color/wheat"
@@ -63,12 +66,13 @@ android:background="@color/tan">
             android:layout_centerHorizontal="true"
     />
     <DatePicker
-            android:id="@+id/datePicker"
+            android:id="@+id/groupDate"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_centerHorizontal="true"
     android:layout_marginTop="225dp"/>
     <EditText
+            android:id="@+id/groupRotation"
             android:layout_width="200dp"
             android:layout_height="30dp"
             android:background="@color/wheat"
@@ -78,6 +82,7 @@ android:background="@color/tan">
             android:layout_centerHorizontal="true"
     />
     <Button
+            android:id="@+id/createGroup"
             android:layout_width="100dp"
             android:layout_height="40dp"
             android:backgroundTint="@color/wheat"
