@@ -55,7 +55,9 @@ public class CreatGroup extends AppCompatActivity {
         int year = groupMeeting.getYear();
         int month = groupMeeting.getMonth();
         int day = groupMeeting.getDayOfMonth();
-        //TODO - add Database access \n - creat a instance of the Group Class -> pass this in to the Database \n - get current user and pass user into Databas or Group Class
+        //TODO - add Database access
+        // - creat a instance of the Group Class -> pass this in to the Database
+        // - get current user and pass user into Databas or Group Class
         Intent intent = new Intent(CreatGroup.this, MainActivity.class);
         startActivity(intent);
     }
