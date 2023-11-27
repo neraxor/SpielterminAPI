@@ -19,6 +19,9 @@
                 android:name=".Profil"
                 android:exported="false"/>
         <activity
+                android:name=".CreatGroup"
+                android:exported="false"/>
+        <activity
                 android:name=".LoginActivity"
                 android:exported="true">
             <intent-filter>
