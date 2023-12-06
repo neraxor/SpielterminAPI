@@ -1,6 +1,5 @@
 package com.example.boardgameapp.DAO;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
@@ -9,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
-import com.example.boardgameapp.Spielgruppe;
+import com.example.boardgameapp.modul.Spielgruppe;
 
 import org.json.JSONException;
 import org.json.JSONObject;
