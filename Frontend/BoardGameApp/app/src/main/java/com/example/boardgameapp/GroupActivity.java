@@ -91,7 +91,9 @@ public class GroupActivity extends AppCompatActivity {
             gastgeber.setText(String.valueOf(spieltermin.getGastgeberId()));
 
             cardView.setOnClickListener(v -> {
-                Log.d("MainActivity", "LinearLayout angeklickt! Index: " + index);
+                Intent intent = new Intent(GroupActivity.this, TerminActivity.class);
+                intent.putExtra("spieltermin", spieltermin);
+                startActivity(intent);
             });
 
             container.addView(cardView);
