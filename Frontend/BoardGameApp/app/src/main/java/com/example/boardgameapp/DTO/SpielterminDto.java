@@ -8,6 +8,7 @@ public class SpielterminDto implements Serializable {
     private LocalDateTime termin;
     private int spielgruppeId;
     private int gastgeberId;
+    private String gruppenName;
 
     public int getId() {
         return id;
@@ -39,6 +40,12 @@ public class SpielterminDto implements Serializable {
 
     public void setGastgeberId(int gastgeberId) {
         this.gastgeberId = gastgeberId;
+    }
+    public String getGruppenName() {
+        return gruppenName;
+    }
+    public void setGruppenName(String gruppenName) {
+        this.gruppenName = gruppenName;
     }
 }
 

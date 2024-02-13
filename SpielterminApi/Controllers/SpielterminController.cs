@@ -158,11 +158,16 @@ namespace SpielterminApi.Controllers
                         Wohnort = gastgeber.Wohnort,
                         PLZ = gastgeber.PLZ,
                         Straße = gastgeber.Straße,
-                        Hausnummer = gastgeber.Hausnummer
+                        Hausnummer = gastgeber.Hausnummer,
+                        Vorname = gastgeber.Vorname,
+                        Nachname = gastgeber.Nachname,
+                        Username = gastgeber.Benutzername,
+                        Id = gastgeber.ID
                     };
                     //var Adresse = spieler.Wohnort + " " + spieler.PLZ + " " + spieler.Straße + " " + spieler.Hausnummer;  
                     return gastgeberAdresse;
                 }
+                return NotFound("Gastgeber nicht gefunden.");
             }
             return NotFound("Spieltermin oder Gastgeber nicht gefunden.");
         }

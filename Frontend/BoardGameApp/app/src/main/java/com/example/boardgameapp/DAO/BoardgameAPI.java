@@ -13,15 +13,18 @@ import androidx.security.crypto.MasterKeys;
 import com.example.boardgameapp.Callbacks.CreateAbendbewertungCallback;
 import com.example.boardgameapp.Callbacks.CreateSpielgruppeCallback;
 import com.example.boardgameapp.Callbacks.EssensabstimmenCallback;
+import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
 import com.example.boardgameapp.Callbacks.GetEssensrichtungCallback;
 import com.example.boardgameapp.Callbacks.GetSpielerCallback;
 import com.example.boardgameapp.Callbacks.GetSpielvorschlagCallback;
 import com.example.boardgameapp.Callbacks.NachrichtCallback;
 import com.example.boardgameapp.Callbacks.ProfilCallback;
+import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
 import com.example.boardgameapp.Callbacks.SpielterminCallback;
 import com.example.boardgameapp.Callbacks.SpielvorschlagAbstimmungCallback;
 import com.example.boardgameapp.Callbacks.SpielvorschlagCallback;
 import com.example.boardgameapp.DTO.Essensrichtung;
+import com.example.boardgameapp.DTO.SpielerDto;
 import com.example.boardgameapp.DTO.SpielgruppeDTO;
 import com.example.boardgameapp.DTO.SpielterminDto;
 import com.example.boardgameapp.DTO.SpielvorschlagDto;
@@ -63,7 +66,7 @@ public class BoardgameAPI extends AppCompatActivity {
     //die query ist immer recht ähnlich aufgebaut und entweder ein post oder ein get
     //aktuell hab ich noch meine lokale ip angegeben, die muss dann noch geändert werden bzw in eine config
     //get
-    private void GetGastgeberAdresse(int SpielterminID) {
+    public void GetGastgeberAdresse(int SpielterminID, GastgeberAdresseCallback callback) {
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -89,18 +92,12 @@ public class BoardgameAPI extends AppCompatActivity {
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = new JSONObject(responseData);
-                    } catch (JSONException e) {
-                    }
-                    try {
-                        Spielgruppe spielgruppe = new Spielgruppe();
-                        spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
-                    } catch (JSONException e) {
-                    }
+                String responseData = response.body().string();
+                if (response.isSuccessful())
+                {
+                    Gson gson = new Gson();
+                    SpielerDto spielerDto = gson.fromJson(responseData, SpielerDto.class);
+                    callback.onSuccess(spielerDto);
                 }
             }
         });
@@ -512,6 +509,39 @@ public class BoardgameAPI extends AppCompatActivity {
                     Type spielgruppeListType = new TypeToken<ArrayList<SpielgruppeDTO>>(){}.getType();
                     ArrayList<SpielgruppeDTO> spielgruppen = gson.fromJson(responseData, spielgruppeListType);
                     callback.onSuccess(spielgruppen);
+                }
+            }
+        });
+    }
+
+    public void getSpielgruppeById(int spielgruppeId, SpielgruppeByIdCallback callback){
+        OkHttpClient client = new OkHttpClient();
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("spielgruppeId", spielgruppeId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/GetSpielgruppeNameById").newBuilder();
+        urlBuilder.addQueryParameter("spielgruppeId", String.valueOf(spielgruppeId));
+        String url = urlBuilder.build().toString();
+        String token = getToken();
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .header("Authorization", "Bearer " + token)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    callback.onSuccess(responseData);
                 }
             }
         });

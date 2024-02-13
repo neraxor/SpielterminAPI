@@ -108,5 +108,50 @@ namespace SpielterminApi.Controllers
             return Ok(responseDto);
         }
 
+        //[HttpGet, Authorize]
+        //[Route("/GetSpielgruppeNameById")]
+        //public async Task<ActionResult<string>> GetSpielgruppeNameById(int spielgruppeId)
+        //{
+        //    int SpielerId = _userService.GetSpielerId();
+
+        //    var spielerInGruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == spielgruppeId && x.SpielerId == SpielerId);
+        //    if (!spielerInGruppe)
+        //    {
+        //        return Unauthorized("Spieler ist nicht in der Spielgruppe");
+        //    }
+        //    var spielgruppe = await _context.Spielgruppen.FindAsync(spielgruppeId);
+
+        //    if (spielgruppe == null)
+        //    {
+        //        return NotFound("Spielgruppe wurde nicht gefunden.");
+        //    }
+
+        //    return spielgruppe.Name;
+        //}
+
+        [HttpGet, Authorize]
+        [Route("/GetSpielgruppeNameById")]
+        public async Task<ActionResult<string>> GetSpielgruppeNameById(int spielterminId)
+        {
+            int SpielerId = _userService.GetSpielerId();
+
+            var spieltermin = await _context.Spieltermine.Include(x => x.Spielgruppe).ThenInclude(x => x.SpielgruppeSpieler).FirstOrDefaultAsync(x => x.ID == spielterminId);
+
+            int spielgruppeId = spieltermin.SpielgruppeId;
+
+            var spielerInGruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == spielgruppeId && x.SpielerId == SpielerId);
+            if (!spielerInGruppe)
+            {
+                return Unauthorized("Spieler ist nicht in der Spielgruppe");
+            }
+            var spielgruppe = await _context.Spielgruppen.FindAsync(spielgruppeId);
+
+            if (spielgruppe == null)
+            {
+                return NotFound("Spielgruppe wurde nicht gefunden.");
+            }
+
+            return spielgruppe.Name;
+        }
     }
 }
