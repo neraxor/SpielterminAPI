@@ -67,7 +67,8 @@ namespace SpielterminApi.Controllers
                     Essensbewertung = abendbewertung.Essensbewertung,
                     AbendbewertungName = abendbewertung.AbendbewertungName
                 };
-                return Ok(abendbewertungResponse);
+                return Ok("Bewertung erfolgreich gespeichert.");
+                //return Ok(abendbewertungResponse);
             }
 
             return BadRequest("Abendbewertung konnte nicht gespeichert werden.");

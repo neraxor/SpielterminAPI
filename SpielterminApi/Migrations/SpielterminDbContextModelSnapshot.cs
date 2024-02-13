@@ -110,11 +110,13 @@ namespace SpielterminApi.Migrations
                     b.Property<int>("AbsenderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("NachrichtText")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NachrichtText")
+                        .HasColumnType("int");
 
                     b.Property<int>("SpielgruppeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpielterminId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Uhrzeit")

@@ -29,22 +29,23 @@ namespace SpielterminApi.Controllers
         public async Task<ActionResult<Nachricht>> CreateNachricht(NachrichtDto request)
         {
             int SpielerId = _userService.GetSpielerId();
-            var nachrichtExists = _context.Nachrichten.Any(n => n.AbsenderId == SpielerId && n.SpielgruppeId == request.SpielgruppeId && n.NachrichtText == request.NachrichtText);
+            var nachrichtExists = _context.Nachrichten.Any(n => n.AbsenderId == SpielerId && n.SpielgruppeId == request.SpielgruppeId  && n.SpielterminId == request.SpielterminId);
 
             if (nachrichtExists)
             {
-                return BadRequest("Nachricht existiert bereits");
+                return BadRequest("Verspätung bereits gesendet");
             }
             var isSpielerInSpielgruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == request.SpielgruppeId && x.SpielerId == SpielerId);
             if (!isSpielerInSpielgruppe)
             {
-                return Unauthorized("Sie sind nicht in der Spielgruppe für diese Nachrichten");
+                return Unauthorized("Sie sind nicht in der Spielgruppe für diese Verspätungen");
             }
             var nachricht = new Nachricht
             {
                 AbsenderId = SpielerId,
                 SpielgruppeId = request.SpielgruppeId,
                 NachrichtText = request.NachrichtText,
+                SpielterminId = request.SpielterminId,
                 Uhrzeit = DateTime.Now 
             };
             _context.Nachrichten.Add(nachricht);
@@ -58,10 +59,11 @@ namespace SpielterminApi.Controllers
                     NachrichtText = nachricht.NachrichtText,
                     Uhrzeit = nachricht.Uhrzeit
                 };
-                return Ok(nachrichtResponse);
+                //return Ok(nachrichtResponse);
+                return Ok("Verspätung gesendet");
             }
 
-            return BadRequest("Nachricht konnte nicht gespeichert werden");
+            return BadRequest("Verspätung konnte nicht gespeichert werden");
         }
         /// <summary>
         /// Liefert alle Nachrichten einer Spielgruppe absteigend sortiert nach Uhrzeit
@@ -71,9 +73,9 @@ namespace SpielterminApi.Controllers
         /// <param name="limitAnzahl">Gibt an ob alle Nachrichten oder nur eine begrenzte Anzahl returned werden</param>
         /// <returns></returns>
         [HttpGet("get-nachrichten"), Authorize]
-        public async Task<ActionResult<IEnumerable<NachrichtDto>>> GetNachrichten(int spielgruppeId,int anzahlNachrichten = 10, bool limitAnzahl = false)
+        public async Task<ActionResult<IEnumerable<NachrichtDto>>> GetNachrichten(int SpielerId, int spielgruppeId,int anzahlNachrichten = 10, bool limitAnzahl = false)
         {
-            int SpielerId = _userService.GetSpielerId();
+            //int SpielerId = _userService.GetSpielerId();
 
             var isSpielerInSpielgruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == spielgruppeId && x.SpielerId == SpielerId);
             if (!isSpielerInSpielgruppe)

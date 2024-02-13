@@ -19,6 +19,53 @@ namespace SpielterminApi.Controllers
             _userService = userService;
         }
 
+        /// <returns></returns>
+        [HttpGet, Authorize]
+        [Route("/GetSpieler")]
+        public async Task<ActionResult<IEnumerable<SpielerDto>>> GetSpielerOfSpieltermin(int SpielgruppenId, int SpielterminId)
+        {
+            int SpielerId = _userService.GetSpielerId();
+            var istMitgliedDerGruppe = await _context.SpielgruppeSpieler
+                .AnyAsync(x => x.SpielgruppeId == SpielgruppenId && x.SpielerId == SpielerId);
+
+            if (!istMitgliedDerGruppe)
+            {
+                return Unauthorized("Nutzer ist nicht Teil der Spielgruppe.");
+            }
+
+            var Spielgruppen = await _context.SpielgruppeSpieler
+                .Where(x => x.SpielgruppeId == SpielgruppenId)
+                .Select(x => x.SpielerId)
+                .ToListAsync();
+            if (Spielgruppen.Count > 0)
+            {
+                var spieler = await _context.Spieler
+                    .Where(x => Spielgruppen.Contains(x.ID))
+                    .Select(x => new SpielerDto
+                    {
+                        Username = x.Benutzername,
+                        Vorname = x.Vorname,
+                        Nachname = x.Nachname,
+                        Wohnort = x.Wohnort,
+                        Straße = x.Straße,
+                        Hausnummer = x.Hausnummer,
+                        PLZ = x.PLZ,
+                        Id = x.ID
+                    })
+                    .ToListAsync();
+                foreach (var spielerDto in spieler)
+                {
+                    var verspätung = await _context.Nachrichten
+                        .Where(n => n.SpielterminId == SpielterminId && n.AbsenderId == spielerDto.Id) 
+                        .Select(n => n.NachrichtText)
+                        .FirstOrDefaultAsync();
+                    spielerDto.Verspätung = verspätung;
+                }
+                return spieler;
+            }
+            return BadRequest("Keine Teilnehmer gefunden.");
+        }
+
         /// <summary>
         /// Gibt alle Spieltermin für einen Spieler zurück. Optional bei filterByDate = true nur Termine ab heute.
         /// </summary>

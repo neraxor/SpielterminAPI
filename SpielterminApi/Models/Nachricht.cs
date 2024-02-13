@@ -8,7 +8,7 @@ namespace SpielterminApi.Models
         [Key]
         public int ID { get; set; }
         [Required]
-        public string NachrichtText { get; set; }
+        public int NachrichtText { get; set; }
         [Required]
         public  DateTime Uhrzeit { get; set; }
 
@@ -17,9 +17,12 @@ namespace SpielterminApi.Models
 
         [ForeignKey("Spielgruppe")]
         public int SpielgruppeId { get; set; }
+        [ForeignKey("Spieltermin")]
+        public int SpielterminId { get; set; }
 
         [Required]
         public virtual Spieler Absender { get; set; }
+
         [Required]
         public virtual  Spielgruppe Spielgruppe { get; set; }
     }

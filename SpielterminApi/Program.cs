@@ -52,7 +52,7 @@ builder.WebHost.UseUrls("http://0.0.0.0:7063");
 var app = builder.Build();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Spieltermin API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Spieltermin API v1.1");
 });
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

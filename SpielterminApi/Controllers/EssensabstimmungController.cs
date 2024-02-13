@@ -27,6 +27,7 @@ namespace SpielterminApi.Controllers
         /// <param name="request">benötigt SpielterminId und EssensrichtungId</param>
         /// <returns></returns>
         [HttpPost("Essenabstimmen"), Authorize]
+
         public async Task<ActionResult<EssensabstimmungDto>> Esssenabstimmen(EssensabstimmungDto request)
         {
             int SpielerId = _userService.GetSpielerId();
@@ -65,7 +66,8 @@ namespace SpielterminApi.Controllers
                     SpielerId = abstimmung.SpielerId,
                     SpielterminId = abstimmung.SpielterminId
                 };
-                return Ok(abstimmungResponse);
+                return Ok("Abstimmung wurde gespeichert.");
+                //return Ok(abstimmungResponse);
             }
             return BadRequest("Abstimmung konnte nicht gespeichert werden");          
         }

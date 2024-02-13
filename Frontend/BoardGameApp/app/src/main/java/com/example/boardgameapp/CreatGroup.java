@@ -6,17 +6,23 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.example.boardgameapp.Callbacks.CreateSpielgruppeCallback;
+import com.example.boardgameapp.DAO.BoardgameAPI;
+import com.example.boardgameapp.DTO.SpielgruppeDTO;
+
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class CreatGroup extends AppCompatActivity {
 
-
+    private BoardgameAPI boardgameAPI;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_creat_group);
         Calendar todaysDate = Calendar.getInstance();
+        boardgameAPI = new BoardgameAPI(this);
         final  DatePicker groupMeeting = findViewById(R.id.groupDate);
         groupMeeting.updateDate(todaysDate.get(Calendar.YEAR), todaysDate.get(Calendar.MONTH) , todaysDate.get(Calendar.DAY_OF_MONTH));
         appNavigation();
@@ -58,6 +64,20 @@ public class CreatGroup extends AppCompatActivity {
         //TODO - add Database access
         // - creat a instance of the Group Class -> pass this in to the Database
         // - get current user and pass user into Databas or Group Class
+        Calendar calendar = new GregorianCalendar(year, month, day);
+        Date date = calendar.getTime();
+        boardgameAPI.CreateSpielgruppe(name, new CreateSpielgruppeCallback() {
+            @Override
+            public void onSuccess(SpielgruppeDTO spielgruppeDTO) {
+                boardgameAPI.CreateSpieltermin(spielgruppeDTO.getId(), date);
+            }
+            @Override
+            public void onFailure(Exception e) {
+                // Fehlerbehandlung Gruppe wurde nicht erstellt Benachrichtigung des Benutzers
+            }
+        });
+
+        //SpielgruppeDTO spielgruppeDTO =  boardgameAPI.CreateSpielgruppe(name);
         Intent intent = new Intent(CreatGroup.this, MainActivity.class);
         startActivity(intent);
     }
@@ -77,7 +97,7 @@ public class CreatGroup extends AppCompatActivity {
         buttonProfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CreatGroup.this, Profil.class);
+                Intent intent = new Intent(CreatGroup.this, ProfilActivity.class);
                 startActivity(intent);
             }
         });

@@ -1,24 +1,48 @@
 package com.example.boardgameapp.DAO;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Base64;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
+import com.example.boardgameapp.Callbacks.CreateAbendbewertungCallback;
+import com.example.boardgameapp.Callbacks.CreateSpielgruppeCallback;
+import com.example.boardgameapp.Callbacks.EssensabstimmenCallback;
+import com.example.boardgameapp.Callbacks.GetEssensrichtungCallback;
+import com.example.boardgameapp.Callbacks.GetSpielerCallback;
+import com.example.boardgameapp.Callbacks.GetSpielvorschlagCallback;
+import com.example.boardgameapp.Callbacks.NachrichtCallback;
+import com.example.boardgameapp.Callbacks.ProfilCallback;
+import com.example.boardgameapp.Callbacks.SpielterminCallback;
+import com.example.boardgameapp.Callbacks.SpielvorschlagAbstimmungCallback;
+import com.example.boardgameapp.Callbacks.SpielvorschlagCallback;
+import com.example.boardgameapp.DTO.Essensrichtung;
+import com.example.boardgameapp.DTO.SpielgruppeDTO;
+import com.example.boardgameapp.DTO.SpielterminDto;
+import com.example.boardgameapp.DTO.SpielvorschlagDto;
+import com.example.boardgameapp.GsonUtil;
 import com.example.boardgameapp.modul.Spielgruppe;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import okhttp3.Call;
@@ -31,6 +55,10 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class BoardgameAPI extends AppCompatActivity {
+    private Context context;
+    public BoardgameAPI(Context contex) {
+        this.context = contex;
+    }
     //hier folgen nun alle querys für die api
     //die query ist immer recht ähnlich aufgebaut und entweder ein post oder ein get
     //aktuell hab ich noch meine lokale ip angegeben, die muss dann noch geändert werden bzw in eine config
@@ -78,7 +106,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
     //post
-    private void CreateAbendbewertung(int spielterminId, int gastgeberBewertung, int essensBewertung, int abendBewertung,int spielerId) {
+    public void CreateAbendbewertung(int spielterminId, int gastgeberBewertung, int essensBewertung, int abendBewertung, int spielerId, CreateAbendbewertungCallback callback) {
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -102,15 +130,11 @@ public class BoardgameAPI extends AppCompatActivity {
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
+            public void onFailure(Call call, IOException e) {e.printStackTrace();}
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-                }
+                callback.onSuccess(response.body().string());
             }
         });
     }
@@ -148,8 +172,6 @@ public class BoardgameAPI extends AppCompatActivity {
                         jsonObject = new JSONObject(responseData);
                     } catch (JSONException e) {
                     }
-                    //ergebnise setzen wie z.b.
-                    //spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
                 }
             }
         });
@@ -188,14 +210,12 @@ public class BoardgameAPI extends AppCompatActivity {
                         jsonObject = new JSONObject(responseData);
                     } catch (JSONException e) {
                     }
-                    //ergebnise setzen wie z.b.
-                    //spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
                 }
             }
         });
     }
     //Post
-    private void Essensabstimmen(int spielterminId, int essensrichtungId){
+    public void Essensabstimmen(int spielterminId, int essensrichtungId, EssensabstimmenCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -223,9 +243,8 @@ public class BoardgameAPI extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-                }
+                String responseData = response.body().string();
+                callback.onSuccess(responseData);
             }
         });
     }
@@ -263,15 +282,13 @@ public class BoardgameAPI extends AppCompatActivity {
                         jsonObject = new JSONObject(responseData);
                     } catch (JSONException e) {
                     }
-                    //ergebnise setzen wie z.b.
-                    //spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
                 }
             }
         });
     }
 
     // GetEssensrichtungen
-    private void Esseensrichtung(){
+    public void Essensrichtung(GetEssensrichtungCallback callback){
         OkHttpClient client = new OkHttpClient();
         HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Essensrichtung").newBuilder();
         String url = urlBuilder.build().toString();
@@ -290,28 +307,77 @@ public class BoardgameAPI extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = new JSONObject(responseData);
-                    } catch (JSONException e) {
-                    }
-                    //ergebnise setzen wie z.b.
-                    //spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
+                    Gson gson = GsonUtil.getGson();
+                    Type listType = new TypeToken<ArrayList<Essensrichtung>>(){}.getType();
+                    ArrayList<Essensrichtung> essensrichtungen = gson.fromJson(responseData, listType);
+                    callback.onSuccess(essensrichtungen);
                 }
+            }
+        });
+    }
+
+    // GetSpieler
+    public void GetSpieler(int spielgruppeId,int spielterminId,GetSpielerCallback callback){
+        OkHttpClient client = new OkHttpClient();
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("SpielgruppenId", spielgruppeId);
+            jsonObject.put("SpielterminId", spielterminId);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/GetSpieler").newBuilder();
+        urlBuilder.addQueryParameter("SpielgruppenId", String.valueOf(spielgruppeId));
+        urlBuilder.addQueryParameter("SpielterminId", String.valueOf(spielterminId));
+        String url = urlBuilder.build().toString();
+        String token = getToken();
+        RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .header("Authorization", "Bearer " + token)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseData = response.body().string();
+
+                try {
+                    JSONArray jsonArray = new JSONArray(responseData);
+                    ArrayList<String> vornamenListe = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        String vorname = jsonObject.getString("vorname");
+                        int verspätung = Integer.parseInt(jsonObject.getString("verspätung"));
+                        if (verspätung > 0 ) {
+                            //ggf. noch Nachnamen oder Username nutzen
+                            vorname = vorname +" "+ verspätung+" Min verspätet";
+                        }
+                        vornamenListe.add(vorname);
+                    }
+                    callback.onSuccess(vornamenListe);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                } ;
             }
         });
     }
     //post
     //RequiresApi wird für localdatetime benötigt
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void CreateNachricht(int spielgruppeId, String nachrichtText){
+    public void CreateNachricht(int spielgruppeId, int nachrichtText,int spielterminId, NachrichtCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("spielgruppeId", spielgruppeId);
             jsonObject.put("nachrichtText", nachrichtText);
-            // leere Daten fürs DTO
+            jsonObject.put("spielterminId", spielterminId);
             jsonObject.put("id", 0);
             ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"));
             DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
@@ -342,9 +408,8 @@ public class BoardgameAPI extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-                }
+                String responseData = response.body().string();
+                callback.onSuccess(responseData);
             }
         });
     }
@@ -386,14 +451,12 @@ public class BoardgameAPI extends AppCompatActivity {
                         jsonObject = new JSONObject(responseData);
                     } catch (JSONException e) {
                     }
-                    //ergebnise setzen wie z.b.
-                    //spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
                 }
             }
         });
     }
     //post
-    private void CreateSpielabstimmung(int spielgruppeId,int spielvorschlagId, int zustimmung){
+    public void CreateSpielabstimmung(int spielgruppeId, int spielvorschlagId, boolean zustimmung, SpielvorschlagAbstimmungCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -401,7 +464,6 @@ public class BoardgameAPI extends AppCompatActivity {
             jsonObject.put("spielgruppeId", spielgruppeId);
             jsonObject.put("spielvorschlagId", spielvorschlagId);
             jsonObject.put("zustimmung", zustimmung);
-            // leere Daten fürs DTO
             jsonObject.put("spielerId", 0);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -421,14 +483,13 @@ public class BoardgameAPI extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-                }
+                String responseData = response.body().string();
+                callback.onSuccess("Abstimmung gespeichert");
             }
         });
     }
     //get Spielgruppe
-    private void GetSpielgruppe(){
+    public void GetSpielgruppe(ProfilCallback callback){
         OkHttpClient client = new OkHttpClient();
         HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Spielgruppe").newBuilder();
         String url = urlBuilder.build().toString();
@@ -447,25 +508,21 @@ public class BoardgameAPI extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = new JSONObject(responseData);
-                    } catch (JSONException e) {
-                    }
-                    //ergebnise setzen wie z.b.
-                    //spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
+                    Gson gson = GsonUtil.getGson();
+                    Type spielgruppeListType = new TypeToken<ArrayList<SpielgruppeDTO>>(){}.getType();
+                    ArrayList<SpielgruppeDTO> spielgruppen = gson.fromJson(responseData, spielgruppeListType);
+                    callback.onSuccess(spielgruppen);
                 }
             }
         });
     }
     //post - Spielgruppe
-    private void CreateSpielgruppe(String name){
+    public SpielgruppeDTO CreateSpielgruppe(String name, CreateSpielgruppeCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("name", name);
-            // leere Daten fürs DTO
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -476,22 +533,31 @@ public class BoardgameAPI extends AppCompatActivity {
                 .post(body)
                 .header("Authorization", "Bearer " + token)
                 .build();
+        SpielgruppeDTO spielgruppeDTO = new SpielgruppeDTO();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+                callback.onFailure(e);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
+                    Gson gson = new Gson();
+                    SpielgruppeDTO spielgruppeDTO = gson.fromJson(responseData, SpielgruppeDTO.class);
+                    callback.onSuccess(spielgruppeDTO);
+                }
+                else
+                {
+                    callback.onFailure(new IOException("Anfrage fehlgeschlagen mit HTTP Code: " + response.code()));
                 }
             }
         });
+        return spielgruppeDTO;
     }
     //post AddSpieler
-    private void AddSpielerToSpielgruppe(String username, int spielgruppeId){
+    public void AddSpielerToSpielgruppe(String username, int spielgruppeId){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -528,7 +594,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
     //get
-    private void GetSpieltermineBySpieler(boolean filterByDate){
+    public ArrayList<SpielterminDto> GetSpieltermineBySpieler(Boolean filterByDate, SpielterminCallback callback) {
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -547,6 +613,7 @@ public class BoardgameAPI extends AppCompatActivity {
                 .get()
                 .header("Authorization", "Bearer " + token)
                 .build();
+        ArrayList<SpielterminDto> spielterminDto = new ArrayList<SpielterminDto>();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -556,19 +623,18 @@ public class BoardgameAPI extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = new JSONObject(responseData);
-                    } catch (JSONException e) {
-                    }
-                    //ergebnise setzen wie z.b.
-                    //spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
+                    // GsonUtil zum Anpassen vom Datum
+                    Gson gson = GsonUtil.getGson();
+                    Type spieltermineListType = new TypeToken<ArrayList<SpielterminDto>>(){}.getType();
+                    ArrayList<SpielterminDto> spieltermine = gson.fromJson(responseData, spieltermineListType);
+                    callback.onSuccess(spieltermine);
                 }
             }
         });
+        return spielterminDto;
     }
     //get
-    private void GetSpieltermineByGruppe(boolean filterByDate, int SpielgruppenId){
+    public void GetSpieltermineByGruppe(boolean filterByDate, int SpielgruppenId, SpielterminCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -598,20 +664,17 @@ public class BoardgameAPI extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = new JSONObject(responseData);
-                    } catch (JSONException e) {
-                    }
-                    //ergebnise setzen wie z.b.
-                    //spielgruppe.setGastgeberOrt(jsonObject.getString("wohnort"));
+                    Gson gson = GsonUtil.getGson();
+                    Type spieltermineListType = new TypeToken<ArrayList<SpielterminDto>>(){}.getType();
+                    ArrayList<SpielterminDto> spieltermine = gson.fromJson(responseData, spieltermineListType);
+                    callback.onSuccess(spieltermine);
                 }
             }
         });
     }
     //post
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void CreateSpieltermin(int spielgruppeId, Date termin){
+    public void CreateSpieltermin(int spielgruppeId, Date termin){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -625,7 +688,6 @@ public class BoardgameAPI extends AppCompatActivity {
             jsonObject.put("termin", formattedDateTime);
 
             //jsonObject.put("termin", termin);
-            // leere Daten fürs DTO
             jsonObject.put("gastgeberId", 0);
             jsonObject.put("id", 0);
 
@@ -658,7 +720,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
     //post
-    private void CreateSpielvorschlag(int spielterminId, String spielvorschlagName)
+    public void CreateSpielvorschlag(int spielterminId, String spielvorschlagName, SpielvorschlagCallback callback)
     {
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -686,19 +748,47 @@ public class BoardgameAPI extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-                }
+
+                String responseData = response.body().string();
+                callback.onSuccess(responseData);
             }
         });
     }
+    public void getSpielvorschlag(int spielterminId, GetSpielvorschlagCallback callback){
+        OkHttpClient client = new OkHttpClient();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Spielvorschlag/get-spielvorschlag").newBuilder();
+        urlBuilder.addQueryParameter("SpielterminId", String.valueOf(spielterminId));
+        String url = urlBuilder.build().toString();
+        String token = getToken();
 
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onFailure(e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseData = response.body().string();
+                Gson gson = new Gson();
+                Type spielvorschlagListType = new TypeToken<ArrayList<SpielvorschlagDto>>(){}.getType();
+                List<SpielvorschlagDto> spielvorschlaege = gson.fromJson(responseData, spielvorschlagListType);
+                callback.onSuccess(spielvorschlaege);
+            }
+        });
+    }
     public String getToken() {
         try {
             SharedPreferences sharedPreferences = EncryptedSharedPreferences.create(
                     "encrypted_prefs",
                     MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
-                    this,
+                    context,
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             );
@@ -707,5 +797,21 @@ public class BoardgameAPI extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
+    }
+    public Integer getSpielerIdFromToken() {
+        try {
+            String token = getToken();
+            String[] parts = token.split("\\.");
+            if (parts.length == 3) {
+                String payload = parts[1];
+                String decodedPayload = new String(Base64.decode(payload, Base64.URL_SAFE));
+                JSONObject payloadObj = new JSONObject(decodedPayload);
+                payloadObj.getString("SpielerId");
+                return Integer.parseInt(payloadObj.getString("SpielerId"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

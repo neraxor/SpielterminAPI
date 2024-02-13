@@ -2,6 +2,7 @@
 {
     public class SpielerDto
     {
+        public int Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string Vorname { get; set; }
@@ -10,5 +11,6 @@
         public string Straße { get; set; }
         public string Hausnummer { get; set; }
         public string PLZ { get; set; }
+        public int Verspätung { get; set; }
     }
 }

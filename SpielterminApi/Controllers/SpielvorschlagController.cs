@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Collections;
+using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,9 +56,35 @@ namespace SpielterminApi.Controllers
             _context.Spielvorschlaege.Add(spielvorschlag);
             if (await _context.SaveChangesAsync() > 0)
             {
-                return Ok(spielvorschlag);
+                //return Ok(spielvorschlag);
+                return Ok("Spielvorschlag wurde gespeichert");
             }
             return BadRequest("Spielvorschlag konnte nicht gespeichert werden");
+        }
+
+        [HttpGet("get-spielvorschlag"), Authorize]
+        public async Task<ActionResult<IEnumerable<SpielvorschlagDto>>> GetSpielvorschlag(int spielterminId)
+        {
+            int SpielerId = _userService.GetSpielerId();
+            var spieltermin = await _context.Spieltermine.Include(x => x.Spielgruppe).ThenInclude(x => x.SpielgruppeSpieler).FirstOrDefaultAsync(x => x.ID == spielterminId);
+            if (spieltermin == null)
+            {
+                return BadRequest("Spieltermin existiert nicht");
+            }
+            var spielerInGruppe = spieltermin.Spielgruppe.SpielgruppeSpieler.Any(x => x.SpielerId == SpielerId);
+            if (!spielerInGruppe)
+            {
+                return Unauthorized("Spieler ist nicht in der Spielgruppe des Spieltermins");
+            }
+            var spielvorschlaege = await _context.Spielvorschlaege.Where(x => x.SpielterminId == spielterminId).ToListAsync();
+            var spielvorschlagDtos = spielvorschlaege.Select(x => new SpielvorschlagDto
+            {
+                SpielvorschlagName = x.SpielvorschlagName,
+                SpielerId = x.SpielerId,
+                SpielterminId = x.SpielterminId,
+                ID = x.ID
+            }).ToList();
+            return Ok(spielvorschlagDtos);
         }
     }
 }

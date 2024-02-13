@@ -68,7 +68,8 @@ namespace SpielterminApi.Controllers
 
             var resultDto = new SpielgruppeDto
             {
-                Name = spielgruppe.Name
+                Name = spielgruppe.Name,
+                SpielgruppeId = spielgruppe.ID
             };
 
             return Ok(resultDto);

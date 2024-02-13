@@ -22,6 +22,15 @@
                 android:layout_marginBottom="15dp"
         />
         <TextView
+            android:id="@+id/gastgeber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gastgeber:"
+            android:textColor="@color/black"
+            android:layout_marginTop="35dp"
+            android:layout_marginBottom="15dp"
+            />
+        <TextView
                 android:id="@+id/gruppenName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,16 +48,16 @@
                 android:textColor="@color/black"
                 android:textSize="11dp"
                 android:layout_marginLeft="260dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="35dp"
 
         />
         <TextView
                 android:id="@+id/termin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="99.99.9999"
+                android:text="99.99.9999 - 99:99"
                 android:textColor="@color/black"
-                android:layout_marginLeft="260dp"
+                android:layout_marginLeft="240dp"
                 android:layout_marginTop="15dp"
         />
 

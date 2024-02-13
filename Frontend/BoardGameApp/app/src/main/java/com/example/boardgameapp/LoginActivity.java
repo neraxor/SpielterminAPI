@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
-            //TODO: entkemmentieren PostLogin(username, password);
+            PostLogin(username, password);
         }
     }
 
@@ -74,7 +74,6 @@ public class LoginActivity extends AppCompatActivity {
         try {
             jsonObject.put("username", username);
             jsonObject.put("password", password);
-            // leere Daten fürs DTO
             jsonObject.put("vorname", "");
             jsonObject.put("nachname", "");
             jsonObject.put("wohnort", "");

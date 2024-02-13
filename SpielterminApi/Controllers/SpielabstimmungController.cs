@@ -34,7 +34,7 @@ namespace SpielterminApi.Controllers
             {
                 return BadRequest("Spielvorschlag existiert nicht");
             }
-            var abstimmungExists = _context.Spielabstimmungen.Any(x => x.ID == request.SpielvorschlagId && x.SpielvorschlagId == SpielerId && x.SpielgruppeId == request.SpielgruppeId);
+            var abstimmungExists = _context.Spielabstimmungen.Any(x => x.SpielvorschlagId == request.SpielvorschlagId && x.SpielerId == SpielerId && x.SpielgruppeId == request.SpielgruppeId);
             if (abstimmungExists)
             {
                 return BadRequest("Benutzer hat bereits abgestimmt");
@@ -62,7 +62,8 @@ namespace SpielterminApi.Controllers
                     Zustimmung = spielabstimmung.Zustimmung,
                     SpielgruppeId = spielabstimmung.SpielgruppeId
                 };
-                return Ok(spielabstimmungResponse);
+                //return Ok(spielabstimmungResponse);
+                return Ok("Spielabstimmung wurde gespeichert");
             }
 
             return BadRequest("Spielabstimmung konnte nicht gespeichert werden");

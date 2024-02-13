@@ -16,7 +16,7 @@
             android:theme="@style/Theme.BoardGameApp"
             tools:targetApi="31">
         <activity
-                android:name=".Profil"
+                android:name=".ProfilActivity"
                 android:exported="false"/>
 
         <activity
@@ -31,6 +31,8 @@
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".MainActivity"/>
         <activity android:name=".CreatGroup"/>
+        <activity android:name=".GroupActivity"></activity>
+        <activity android:name=".TerminActivity"></activity>
     </application>
 
 </manifest>
