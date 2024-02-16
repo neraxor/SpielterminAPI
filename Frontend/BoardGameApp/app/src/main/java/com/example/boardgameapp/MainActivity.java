@@ -18,6 +18,7 @@ import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
 import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
 import com.example.boardgameapp.Callbacks.SpielterminCallback;
 import com.example.boardgameapp.DAO.BoardgameAPI;
+import com.example.boardgameapp.DTO.SpielerAdvancedDto;
 import com.example.boardgameapp.DTO.SpielerDto;
 import com.example.boardgameapp.DTO.SpielterminDto;
 
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
         boardgameAPI = new BoardgameAPI(this);
         LoadSpieltermine(false);
     }
-    private Map<Integer, SpielerDto> adressenMap = new HashMap<>();
+    private Map<Integer, SpielerAdvancedDto> adressenMap = new HashMap<>();
+
     private void addCardViewsDynamically(List<SpielterminDto> spieltermineList) {
         LinearLayout container = findViewById(R.id.containerForCards);
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -54,31 +56,25 @@ public class MainActivity extends AppCompatActivity {
             TextView ort = cardView.findViewById(R.id.ort);
             TextView termin = cardView.findViewById(R.id.termin);
             TextView tvgastgeber = cardView.findViewById(R.id.gastgeber);
-            gruppenName.setText("DefaultName");
             gruppenId.setText(String.valueOf(spieltermin.getSpielgruppeId()));
-            //ort.setText(String.valueOf(spieltermin.getGastgeberId()));
             LocalDateTime datum = spieltermin.getTermin();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
             String formatiertesDatum = datum.format(formatter);
-            //termin.setText(spieltermin.getTermin().toString());
             termin.setText(formatiertesDatum);
-            //gastgeber.setText(String.valueOf(spieltermin.getGastgeberId()));
-            //grp name
-            //Gastgeber daten
 
 
+            SpielerAdvancedDto spielerAdvancedDto = adressenMap.get(spieltermin.getSpielgruppeId());
 
-            SpielerDto gastgeber = adressenMap.get(spieltermin.getSpielgruppeId());
+            SpielerDto gastgeber = spielerAdvancedDto.getSpielerDto();
             ort.setText(gastgeber.getWohnort()+" "+gastgeber.getStraße()+" "+gastgeber.getHausnummer());
             tvgastgeber.setText(gastgeber.getVorname()+" "+gastgeber.getNachname());
+            gruppenName.setText(spielerAdvancedDto.getGruppenName());
             cardView.setOnClickListener(v -> {
                 Log.d("MainActivity", "LinearLayout angeklickt! Index: " + index);
                 Intent intent = new Intent(MainActivity.this, TerminActivity.class);
                 intent.putExtra("spieltermin", spieltermin);
-                //intent.putExtra("SpielgruppeDTO", spielGruppenListe.get(index));
                 startActivity(intent);
             });
-
             container.addView(cardView);
         }
     }
@@ -117,11 +113,13 @@ public class MainActivity extends AppCompatActivity {
     }
     // Adressen vom Gastgeber des Spieltermins vorausladen
     private void loadAdresseForSpieltermin(SpielterminDto spieltermin) {
+        SpielerAdvancedDto spielerAdvancedDto = new SpielerAdvancedDto();
         boardgameAPI.GetGastgeberAdresse(spieltermin.getId(), new GastgeberAdresseCallback() {
             @Override
             public void onSuccess(SpielerDto response) {
                 if (response != null && response.getWohnort() != null) {
-                    adressenMap.put(spieltermin.getSpielgruppeId(), response);
+                    spielerAdvancedDto.setSpielerDto(response);
+                    loadGruppennamen(spieltermin.getSpielgruppeId(), spielerAdvancedDto);
                 }
             }
             @Override
@@ -131,10 +129,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loadGruppennamen(int spielterminId,SpielerDto gastgeber) {
-        boardgameAPI.getSpielgruppeById(spielterminId, new SpielgruppeByIdCallback() {
+    private void loadGruppennamen(int spielgruppeId, SpielerAdvancedDto spielerAdvancedDto) {
+        boardgameAPI.getSpielgruppeById(spielgruppeId, new SpielgruppeByIdCallback() {
             @Override
             public void onSuccess(String response) {
+                spielerAdvancedDto.setGruppenName(response);
+                adressenMap.put(spielgruppeId, spielerAdvancedDto);
                 Log.d("MainActivity", "SpielgruppeByIdCallback onSuccess: " + response);
             }
             @Override
@@ -143,6 +143,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 }

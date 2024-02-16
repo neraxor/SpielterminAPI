@@ -131,13 +131,13 @@ namespace SpielterminApi.Controllers
 
         [HttpGet, Authorize]
         [Route("/GetSpielgruppeNameById")]
-        public async Task<ActionResult<string>> GetSpielgruppeNameById(int spielterminId)
+        public async Task<ActionResult<string>> GetSpielgruppeNameById(int spielgruppeId)
         {
             int SpielerId = _userService.GetSpielerId();
 
-            var spieltermin = await _context.Spieltermine.Include(x => x.Spielgruppe).ThenInclude(x => x.SpielgruppeSpieler).FirstOrDefaultAsync(x => x.ID == spielterminId);
+            //var spieltermin = await _context.Spieltermine.Include(x => x.Spielgruppe).ThenInclude(x => x.SpielgruppeSpieler).FirstOrDefaultAsync(x => x.ID == spielterminId);
 
-            int spielgruppeId = spieltermin.SpielgruppeId;
+            //int spielgruppeId = spieltermin.SpielgruppeId;
 
             var spielerInGruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == spielgruppeId && x.SpielerId == SpielerId);
             if (!spielerInGruppe)
