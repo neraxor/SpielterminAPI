@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.boardgameapp.Callbacks.SpielvorschlagAbstimmungCallback;
+import com.example.boardgameapp.Callbacks.BasicCallback;
 import com.example.boardgameapp.DAO.BoardgameAPI;
 import com.example.boardgameapp.DTO.SpielterminDto;
 import com.example.boardgameapp.DTO.SpielvorschlagDto;
@@ -20,9 +20,9 @@ public class SpielvorschlagAdapter extends RecyclerView.Adapter<SpielvorschlagAd
     private List<SpielvorschlagDto> spielvorschlaegeListe;
     private BoardgameAPI boardgameAPI;
     private SpielterminDto spieltermin;
-    private SpielvorschlagAbstimmungCallback abstimmungCallback;
+    private BasicCallback abstimmungCallback;
 
-    public SpielvorschlagAdapter(List<SpielvorschlagDto> spielvorschlaegeListe, BoardgameAPI boardgameAPI, SpielterminDto spieltermin, SpielvorschlagAbstimmungCallback callback) {
+    public SpielvorschlagAdapter(List<SpielvorschlagDto> spielvorschlaegeListe, BoardgameAPI boardgameAPI, SpielterminDto spieltermin, BasicCallback callback) {
         this.spielvorschlaegeListe = spielvorschlaegeListe;
         this.boardgameAPI = boardgameAPI;
         this.spieltermin = spieltermin;
@@ -52,7 +52,7 @@ public class SpielvorschlagAdapter extends RecyclerView.Adapter<SpielvorschlagAd
         holder.tvSpielvorschlagBeschreibung.setText(spielvorschlag.getspielvorschlagName());
 
         holder.btnJa.setOnClickListener(v -> {
-            boardgameAPI.CreateSpielabstimmung(spieltermin.getSpielgruppeId(), spielvorschlag.getId(), true, new SpielvorschlagAbstimmungCallback() {
+            boardgameAPI.CreateSpielabstimmung(spieltermin.getSpielgruppeId(), spielvorschlag.getId(), true, new BasicCallback() {
                 @Override
                 public void onSuccess(String response) {
                     abstimmungCallback.onSuccess(response);
@@ -66,7 +66,7 @@ public class SpielvorschlagAdapter extends RecyclerView.Adapter<SpielvorschlagAd
         });
 
         holder.btnNein.setOnClickListener(v -> {
-            boardgameAPI.CreateSpielabstimmung(spieltermin.getSpielgruppeId(), spielvorschlag.getId(), false, new SpielvorschlagAbstimmungCallback() {
+            boardgameAPI.CreateSpielabstimmung(spieltermin.getSpielgruppeId(), spielvorschlag.getId(), false, new BasicCallback() {
                 @Override
                 public void onSuccess(String response) {
                     abstimmungCallback.onSuccess(response);

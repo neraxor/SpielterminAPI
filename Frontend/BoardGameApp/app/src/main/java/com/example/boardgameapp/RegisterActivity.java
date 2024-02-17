@@ -1,8 +1,14 @@
 package com.example.boardgameapp;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
@@ -25,6 +31,24 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        Button btnRegister = findViewById(R.id.btnRegister);
+        TextView benutzernamen = findViewById(R.id.Benutzernamen);
+        TextView password = findViewById(R.id.Password);
+        TextView vorname = findViewById(R.id.Vorname);
+        TextView nachname = findViewById(R.id.Nachname);
+        TextView wohnort = findViewById(R.id.Wohnort);
+        TextView strasse = findViewById(R.id.Strasse);
+        TextView hausnummer = findViewById(R.id.hausnummer);
+        TextView plz = findViewById(R.id.Postleitzahl);
+
+        btnRegister.setOnClickListener(v -> {
+            if (benutzernamen.getText().toString().isEmpty() || password.getText().toString().isEmpty() || vorname.getText().toString().isEmpty() || nachname.getText().toString().isEmpty() || wohnort.getText().toString().isEmpty() || strasse.getText().toString().isEmpty() || hausnummer.getText().toString().isEmpty() || plz.getText().toString().isEmpty()) {
+                popUp("Fehler", "Bitte füllen Sie alle Felder aus",false);
+            }
+            else{
+             register(benutzernamen.getText().toString().trim(), password.getText().toString().trim(), vorname.getText().toString().trim(), nachname.getText().toString().trim(), wohnort.getText().toString().trim(), strasse.getText().toString().trim(), hausnummer.getText().toString().trim(), plz.getText().toString().trim());
+            }
+        });
         //register("testuser", "testpassword", "testvorname", "testnachname", "testwohnort", "teststraße", "testhausnummer", "testplz");
     }
 
@@ -63,6 +87,10 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
+                    popUp("Registierung", "Registrierung erfolgreich",true);
+                }
+                else{
+                    popUp("Registierung", "Registrierung fehlgeschlagen",false);
                 }
             }
         });
@@ -81,5 +109,26 @@ public class RegisterActivity extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
+    }
+    public void popUp(String title ,String message, Boolean success){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                builder.setTitle(title);
+                builder.setMessage(message);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (success) {
+                            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                        }
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
+            }
+        });
     }
 }

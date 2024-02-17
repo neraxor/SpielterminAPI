@@ -10,19 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKeys;
 
-import com.example.boardgameapp.Callbacks.CreateAbendbewertungCallback;
+import com.example.boardgameapp.Callbacks.BasicCallback;
 import com.example.boardgameapp.Callbacks.CreateSpielgruppeCallback;
-import com.example.boardgameapp.Callbacks.EssensabstimmenCallback;
 import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
 import com.example.boardgameapp.Callbacks.GetEssensrichtungCallback;
 import com.example.boardgameapp.Callbacks.GetSpielerCallback;
 import com.example.boardgameapp.Callbacks.GetSpielvorschlagCallback;
-import com.example.boardgameapp.Callbacks.NachrichtCallback;
 import com.example.boardgameapp.Callbacks.ProfilCallback;
-import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
 import com.example.boardgameapp.Callbacks.SpielterminCallback;
-import com.example.boardgameapp.Callbacks.SpielvorschlagAbstimmungCallback;
-import com.example.boardgameapp.Callbacks.SpielvorschlagCallback;
 import com.example.boardgameapp.DTO.Essensrichtung;
 import com.example.boardgameapp.DTO.SpielerDto;
 import com.example.boardgameapp.DTO.SpielgruppeDTO;
@@ -101,7 +96,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
     //post
-    public void CreateAbendbewertung(int spielterminId, int gastgeberBewertung, int essensBewertung, int abendBewertung, int spielerId, CreateAbendbewertungCallback callback) {
+    public void CreateAbendbewertung(int spielterminId, int gastgeberBewertung, int essensBewertung, int abendBewertung, int spielerId, BasicCallback callback) {
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -209,7 +204,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
     //Post
-    public void Essensabstimmen(int spielterminId, int essensrichtungId, EssensabstimmenCallback callback){
+    public void Essensabstimmen(int spielterminId, int essensrichtungId, BasicCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -242,7 +237,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
     //Get
-    private void GetSiegerEssensrichtung(int spielterminId){
+    public void GetSiegerEssensrichtung(int spielterminId, BasicCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -270,11 +265,15 @@ public class BoardgameAPI extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
+                    callback.onSuccess(responseData);
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject(responseData);
                     } catch (JSONException e) {
                     }
+                }
+                else {
+                    callback.onSuccess("");
                 }
             }
         });
@@ -363,7 +362,7 @@ public class BoardgameAPI extends AppCompatActivity {
     //post
     //RequiresApi wird für localdatetime benötigt
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void CreateNachricht(int spielgruppeId, int nachrichtText,int spielterminId, NachrichtCallback callback){
+    public void CreateNachricht(int spielgruppeId, int nachrichtText,int spielterminId, BasicCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -449,7 +448,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
     //post
-    public void CreateSpielabstimmung(int spielgruppeId, int spielvorschlagId, boolean zustimmung, SpielvorschlagAbstimmungCallback callback){
+    public void CreateSpielabstimmung(int spielgruppeId, int spielvorschlagId, boolean zustimmung, BasicCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -510,7 +509,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
 
-    public void getSpielgruppeById(int spielgruppeId, SpielgruppeByIdCallback callback){
+    public void getSpielgruppeById(int spielgruppeId, BasicCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -583,7 +582,7 @@ public class BoardgameAPI extends AppCompatActivity {
         return spielgruppeDTO;
     }
     //post AddSpieler
-    public void AddSpielerToSpielgruppe(String username, int spielgruppeId, CreateAbendbewertungCallback callback){
+    public void AddSpielerToSpielgruppe(String username, int spielgruppeId, BasicCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -749,7 +748,7 @@ public class BoardgameAPI extends AppCompatActivity {
         });
     }
     //post
-    public void CreateSpielvorschlag(int spielterminId, String spielvorschlagName, SpielvorschlagCallback callback)
+    public void CreateSpielvorschlag(int spielterminId, String spielvorschlagName, BasicCallback callback)
     {
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");

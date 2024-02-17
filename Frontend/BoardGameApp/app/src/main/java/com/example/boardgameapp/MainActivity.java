@@ -12,10 +12,9 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.boardgameapp.Callbacks.BasicCallback;
 import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
-import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
 import com.example.boardgameapp.Callbacks.SpielterminCallback;
 import com.example.boardgameapp.DAO.BoardgameAPI;
 import com.example.boardgameapp.DTO.SpielerAdvancedDto;
@@ -49,14 +48,14 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < spieltermineList.size(); i++) {
             final int index = i;
             final SpielterminDto spieltermin = spieltermineList.get(i);
-            View cardView = inflater.inflate(R.layout.group_view, container, false);
+            View cardView = inflater.inflate(R.layout.termin_view, container, false);
 
             TextView gruppenName = cardView.findViewById(R.id.gruppenName);
-            TextView gruppenId = cardView.findViewById(R.id.gruppe);
+            TextView gruppenId = cardView.findViewById(R.id.terminId);
             TextView ort = cardView.findViewById(R.id.ort);
             TextView termin = cardView.findViewById(R.id.termin);
             TextView tvgastgeber = cardView.findViewById(R.id.gastgeber);
-            gruppenId.setText(String.valueOf(spieltermin.getSpielgruppeId()));
+            gruppenId.setText(String.valueOf(spieltermin.getId()));
             LocalDateTime datum = spieltermin.getTermin();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
             String formatiertesDatum = datum.format(formatter);
@@ -64,11 +63,12 @@ public class MainActivity extends AppCompatActivity {
 
 
             SpielerAdvancedDto spielerAdvancedDto = adressenMap.get(spieltermin.getSpielgruppeId());
-
-            SpielerDto gastgeber = spielerAdvancedDto.getSpielerDto();
-            ort.setText(gastgeber.getWohnort()+" "+gastgeber.getStraße()+" "+gastgeber.getHausnummer());
-            tvgastgeber.setText(gastgeber.getVorname()+" "+gastgeber.getNachname());
-            gruppenName.setText(spielerAdvancedDto.getGruppenName());
+            if (spielerAdvancedDto != null) {
+                SpielerDto gastgeber = spielerAdvancedDto.getSpielerDto();
+                ort.setText(gastgeber.getWohnort()+" "+gastgeber.getStraße()+" "+gastgeber.getHausnummer());
+                tvgastgeber.setText(gastgeber.getVorname()+" "+gastgeber.getNachname());
+                gruppenName.setText(spielerAdvancedDto.getGruppenName());
+            }
             cardView.setOnClickListener(v -> {
                 Log.d("MainActivity", "LinearLayout angeklickt! Index: " + index);
                 Intent intent = new Intent(MainActivity.this, TerminActivity.class);
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadGruppennamen(int spielgruppeId, SpielerAdvancedDto spielerAdvancedDto) {
-        boardgameAPI.getSpielgruppeById(spielgruppeId, new SpielgruppeByIdCallback() {
+        boardgameAPI.getSpielgruppeById(spielgruppeId, new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 spielerAdvancedDto.setGruppenName(response);

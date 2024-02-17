@@ -14,26 +14,19 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.boardgameapp.Callbacks.CreateAbendbewertungCallback;
-import com.example.boardgameapp.Callbacks.EssensabstimmenCallback;
+import com.example.boardgameapp.Callbacks.BasicCallback;
 import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
 import com.example.boardgameapp.Callbacks.GetEssensrichtungCallback;
 import com.example.boardgameapp.Callbacks.GetSpielerCallback;
 import com.example.boardgameapp.Callbacks.GetSpielvorschlagCallback;
-import com.example.boardgameapp.Callbacks.NachrichtCallback;
-import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
-import com.example.boardgameapp.Callbacks.SpielvorschlagAbstimmungCallback;
-import com.example.boardgameapp.Callbacks.SpielvorschlagCallback;
 import com.example.boardgameapp.DAO.BoardgameAPI;
 import com.example.boardgameapp.DTO.Essensrichtung;
-import com.example.boardgameapp.DTO.SpielerAdvancedDto;
 import com.example.boardgameapp.DTO.SpielerDto;
 import com.example.boardgameapp.DTO.SpielterminDto;
 import com.example.boardgameapp.DTO.SpielvorschlagDto;
@@ -43,7 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TerminActivity extends AppCompatActivity implements SpielvorschlagAbstimmungCallback {
+public class TerminActivity extends AppCompatActivity implements BasicCallback {
     @Override
     public void onSuccess(String response) {
         popUp("Spielabstimmung", response);
@@ -72,6 +65,25 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
         setupSpielvorschlag();
         fillTeilnehmerListe();
         loadSpielvorschlaege(spieltermin.getId());
+        loadSiegerEssensrichtung();
+    }
+    private void loadSiegerEssensrichtung() {
+        TextView siegerEssensrichtung = findViewById(R.id.tvGewinnerEssen);
+        if(spieltermin.getGastgeberId() != boardgameAPI.getSpielerIdFromToken()){
+            return;
+        }
+        boardgameAPI.GetSiegerEssensrichtung(spieltermin.getId(), new BasicCallback() {
+            @Override
+            public void onSuccess(String response) {
+                runOnUiThread(() -> {
+                    siegerEssensrichtung.setText("Sieger der Essensabstimmung: " + response);
+                });
+            }
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void loadSpielvorschlaege(int spielterminId) {
@@ -151,7 +163,7 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
             popUp("Spielvorschlag", "Bitte geben Sie einen Spielvorschlag ein");
             return;
         }
-        boardgameAPI.CreateSpielvorschlag(spieltermin.getId(),spielvorschlag,new SpielvorschlagCallback() {
+        boardgameAPI.CreateSpielvorschlag(spieltermin.getId(),spielvorschlag,new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 popUp("Spielvorschlag", response);
@@ -176,7 +188,7 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
             popUp("Verspätung", "Bitte geben Sie eine Zahl ein");
             return;
         }
-        boardgameAPI.CreateNachricht(spieltermin.getSpielgruppeId(),verspätungsWert,spieltermin.getId(),new NachrichtCallback() {
+        boardgameAPI.CreateNachricht(spieltermin.getSpielgruppeId(),verspätungsWert,spieltermin.getId(),new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 popUp("Verspätung", response);
@@ -218,7 +230,7 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
         });
     }
     private void loadGruppennamen(int spielgruppeId) {
-        boardgameAPI.getSpielgruppeById(spielgruppeId, new SpielgruppeByIdCallback() {
+        boardgameAPI.getSpielgruppeById(spielgruppeId, new BasicCallback() {
             TextView gruppenName = findViewById(R.id.tvGruppenname);
             @Override
             public void onSuccess(String response) {
@@ -256,10 +268,11 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
     private void essensrichtungWahl(){
         Spinner abstimmungEssenSpinner = findViewById(R.id.abstimmungEssenSpinner);
         Essensrichtung selectedEssensrichtung = (Essensrichtung) abstimmungEssenSpinner.getSelectedItem();
-        boardgameAPI.Essensabstimmen(spieltermin.getId(), selectedEssensrichtung.getId(), new EssensabstimmenCallback() {
+        boardgameAPI.Essensabstimmen(spieltermin.getId(), selectedEssensrichtung.getId(), new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 popUp("Abstimmung", response);
+                loadSiegerEssensrichtung();
             }
             @Override
             public void onFailure(Exception e) {
@@ -296,7 +309,7 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
         }
 
         int spielerId = boardgameAPI.getSpielerIdFromToken();
-        boardgameAPI.CreateAbendbewertung(spieltermin.getId(), gastgeberwert,essenswert,abendwert,spielerId, new CreateAbendbewertungCallback() {
+        boardgameAPI.CreateAbendbewertung(spieltermin.getId(), gastgeberwert,essenswert,abendwert,spielerId, new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 popUp("Bewertung", response);

@@ -19,10 +19,8 @@ import android.widget.TimePicker;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.boardgameapp.Callbacks.CreateAbendbewertungCallback;
-import com.example.boardgameapp.Callbacks.CreateSpielgruppeCallback;
+import com.example.boardgameapp.Callbacks.BasicCallback;
 import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
-import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
 import com.example.boardgameapp.Callbacks.SpielterminCallback;
 import com.example.boardgameapp.DAO.BoardgameAPI;
 import com.example.boardgameapp.DTO.SpielerAdvancedDto;
@@ -86,7 +84,7 @@ public class GroupActivity extends AppCompatActivity {
         for (int i = 0; i < spieltermineList.size(); i++) {
             final int index = i;
             final SpielterminDto spieltermin = spieltermineList.get(i);
-            View cardView = inflater.inflate(R.layout.group_view, container, false);
+            View cardView = inflater.inflate(R.layout.termin_view, container, false);
 
             TextView gruppenName = cardView.findViewById(R.id.gruppenName);
             TextView gruppenId = cardView.findViewById(R.id.gruppe);
@@ -132,7 +130,7 @@ public class GroupActivity extends AppCompatActivity {
             popUp("Gruppe", "Spielername darf nicht leer sein");
             return;
         }
-        boardgameAPI.AddSpielerToSpielgruppe(spieler,spielgruppeDTO.getId(),new CreateAbendbewertungCallback() {
+        boardgameAPI.AddSpielerToSpielgruppe(spieler,spielgruppeDTO.getId(),new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 popUp("Gruppe", response);
@@ -264,7 +262,7 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     private void loadGruppennamen(int spielgruppeId, SpielerAdvancedDto spielerAdvancedDto) {
-        boardgameAPI.getSpielgruppeById(spielgruppeId, new SpielgruppeByIdCallback() {
+        boardgameAPI.getSpielgruppeById(spielgruppeId, new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 spielerAdvancedDto.setGruppenName(response);

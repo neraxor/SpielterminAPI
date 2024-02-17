@@ -106,9 +106,9 @@ namespace SpielterminApi.Controllers
 
             if (meistGestimmt == null)
             {
-                return NotFound("Keine Abstimmungen für diesen Spieltermin gefunden.");
+                return Ok("Keine Abstimmungen für diesen Spieltermin gefunden.");
             }
-            return Ok(meistGestimmt.Essensrichtung);
+            return Ok(meistGestimmt.Essensrichtung.Art);
         }
 
     }
