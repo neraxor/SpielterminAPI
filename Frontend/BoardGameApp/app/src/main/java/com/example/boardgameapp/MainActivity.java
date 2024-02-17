@@ -30,6 +30,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private BoardgameAPI boardgameAPI;
+    private ArrayList<SpielterminDto> spieltermineList = new ArrayList<>();
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +63,14 @@ public class MainActivity extends AppCompatActivity {
             termin.setText(formatiertesDatum);
 
 
-            SpielerAdvancedDto spielerAdvancedDto = adressenMap.get(spieltermin.getSpielgruppeId());
+            SpielerAdvancedDto spielerAdvancedDto = adressenMap.get(spieltermin.getId());
             if (spielerAdvancedDto != null) {
                 SpielerDto gastgeber = spielerAdvancedDto.getSpielerDto();
-                ort.setText(gastgeber.getWohnort()+" "+gastgeber.getStraße()+" "+gastgeber.getHausnummer());
+                ort.setText(gastgeber.getWohnort() + " " + gastgeber.getPlz()+" "+gastgeber.getStraße()+" "+gastgeber.getHausnummer());
                 tvgastgeber.setText(gastgeber.getVorname()+" "+gastgeber.getNachname());
                 gruppenName.setText(spielerAdvancedDto.getGruppenName());
             }
             cardView.setOnClickListener(v -> {
-                Log.d("MainActivity", "LinearLayout angeklickt! Index: " + index);
                 Intent intent = new Intent(MainActivity.this, TerminActivity.class);
                 intent.putExtra("spieltermin", spieltermin);
                 startActivity(intent);
@@ -109,13 +109,19 @@ public class MainActivity extends AppCompatActivity {
         boardgameAPI.GetSpieltermineBySpieler(filterByDate, new SpielterminCallback() {
             @Override
             public void onSuccess(ArrayList<SpielterminDto> spielterminDto) {
+                spieltermineList= spielterminDto;
                 for (SpielterminDto spieltermin : spielterminDto) {
                     loadAdresseForSpieltermin(spieltermin);
                 }
-                runOnUiThread(() -> addCardViewsDynamically(spielterminDto));
+                runOnUiThread(() ->  {
+                        if (adressenMap.size() == spieltermineList.size()) {
+                            addCardViewsDynamically(spielterminDto);
+                        }
+                });
             }
             @Override
             public void onFailure(Exception e) {
+                spieltermineList = new ArrayList<>();
             }
         });
     }
@@ -127,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(SpielerDto response) {
                 if (response != null) {
                     spielerAdvancedDto.setSpielerDto(response);
-                    loadGruppennamen(spieltermin.getSpielgruppeId(), spielerAdvancedDto);
+                    loadGruppennamen(spieltermin.getId(),spieltermin.getSpielgruppeId(), spielerAdvancedDto);
                 }
             }
             @Override
@@ -137,17 +143,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loadGruppennamen(int spielgruppeId, SpielerAdvancedDto spielerAdvancedDto) {
+    private void loadGruppennamen(int spielterminId,int spielgruppeId, SpielerAdvancedDto spielerAdvancedDto) {
         boardgameAPI.getSpielgruppeById(spielgruppeId, new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 spielerAdvancedDto.setGruppenName(response);
-                adressenMap.put(spielgruppeId, spielerAdvancedDto);
-                Log.d("MainActivity", "SpielgruppeByIdCallback onSuccess: " + response);
+                adressenMap.put(spielterminId, spielerAdvancedDto);
+                runOnUiThread(() ->  {
+                    if (adressenMap.size() == spieltermineList.size()) {
+                        addCardViewsDynamically(spieltermineList);
+                    }
+                });
             }
             @Override
             public void onFailure(Exception e) {
-                Log.d("MainActivity", "SpielgruppeByIdCallback onFailure: " + e.getMessage());
             }
         });
     }

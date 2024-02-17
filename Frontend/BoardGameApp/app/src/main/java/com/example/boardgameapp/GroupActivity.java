@@ -44,6 +44,7 @@ import java.util.Map;
 public class GroupActivity extends AppCompatActivity {
     private SpielgruppeDTO spielgruppeDTO;
     private BoardgameAPI boardgameAPI;
+    private ArrayList<SpielterminDto> spieltermineList = new ArrayList<>();
     private Map<Integer, SpielerAdvancedDto> adressenMap = new HashMap<>();
 
     @Override
@@ -59,9 +60,6 @@ public class GroupActivity extends AppCompatActivity {
     }
     private void LoadGruppenDaten(){
         TextView gruppenName = findViewById(R.id.gruppenName);
-        //TextView gruppenNummer = findViewById(R.id.gruppenNummer);
-        //gruppenNummer.setText(String.valueOf(spielgruppeDTO.getId()));
-        //gruppenName.setText("DefaultName");
         LoadSpieltermine(false);
     }
     private void addCardViewsDynamically(List<SpielterminDto> spieltermineList) {
@@ -87,32 +85,30 @@ public class GroupActivity extends AppCompatActivity {
             View cardView = inflater.inflate(R.layout.termin_view, container, false);
 
             TextView gruppenName = cardView.findViewById(R.id.gruppenName);
-            TextView gruppenId = cardView.findViewById(R.id.gruppe);
+            TextView terminId = cardView.findViewById(R.id.terminId);
             TextView ort = cardView.findViewById(R.id.ort);
             TextView termin = cardView.findViewById(R.id.termin);
             TextView gastgeber = cardView.findViewById(R.id.gastgeber);
 
-            //gruppenName.setText("DefaultName");
             gruppenName.setText(spieltermin.getGruppenName());
-            SpielerAdvancedDto spielerAdvancedDto = adressenMap.get(spieltermin.getSpielgruppeId());
+            SpielerAdvancedDto spielerAdvancedDto = adressenMap.get(spieltermin.getId());
 
             if (spielerAdvancedDto != null) {
                 SpielerDto gastgeberdto = spielerAdvancedDto.getSpielerDto();
                 gruppenName.setText(spielerAdvancedDto.getGruppenName());
                 gastgeber.setText(gastgeberdto.getVorname() + " " + gastgeberdto.getNachname());
+                ort.setText(gastgeberdto.getWohnort()+ " "+ gastgeberdto.getPlz() + " " + gastgeberdto.getStraße() + " " + gastgeberdto.getHausnummer());
             } else {
                 gruppenName.setText("");
                 gastgeber.setText("");
+                ort.setText("");
             }
 
-            gruppenId.setText(String.valueOf(spieltermin.getSpielgruppeId()));
-            ort.setText(String.valueOf(spieltermin.getGastgeberId()));
+            terminId.setText(String.valueOf(spieltermin.getId()));
             LocalDateTime datum = spieltermin.getTermin();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
             String formatiertesDatum = datum.format(formatter);
             termin.setText(formatiertesDatum);
-            //termin.setText(spieltermin.getTermin().toString());
-            //gastgeber.setText(String.valueOf(spieltermin.getGastgeberId()));
 
             cardView.setOnClickListener(v -> {
                 Intent intent = new Intent(GroupActivity.this, TerminActivity.class);
@@ -231,14 +227,20 @@ public class GroupActivity extends AppCompatActivity {
         boardgameAPI.GetSpieltermineByGruppe(filterByDate, spielgruppeDTO.getId(), new SpielterminCallback() {
             @Override
             public void onSuccess(ArrayList<SpielterminDto> spielterminDto) {
+                spieltermineList = spielterminDto;
                 for (SpielterminDto spieltermin : spielterminDto) {
                     loadAdresseForSpieltermin(spieltermin);
                 }
-                runOnUiThread(() -> addCardViewsDynamically(spielterminDto));
+                runOnUiThread(() ->  {
+                    if (adressenMap.size() == spieltermineList.size()) {
+                        addCardViewsDynamically(spielterminDto);
+                    }
+                });
             }
 
             @Override
             public void onFailure(Exception e) {
+                spieltermineList = new ArrayList<>();
             }
         });
     }
@@ -250,7 +252,7 @@ public class GroupActivity extends AppCompatActivity {
             public void onSuccess(SpielerDto response) {
                 if (response != null) {
                     spielerAdvancedDto.setSpielerDto(response);
-                    loadGruppennamen(spieltermin.getSpielgruppeId(), spielerAdvancedDto);
+                    loadGruppennamen(spieltermin.getId(),spieltermin.getSpielgruppeId(), spielerAdvancedDto);
                 }
             }
 
@@ -261,13 +263,17 @@ public class GroupActivity extends AppCompatActivity {
         });
     }
 
-    private void loadGruppennamen(int spielgruppeId, SpielerAdvancedDto spielerAdvancedDto) {
+    private void loadGruppennamen(int spielterminId,int spielgruppeId, SpielerAdvancedDto spielerAdvancedDto) {
         boardgameAPI.getSpielgruppeById(spielgruppeId, new BasicCallback() {
             @Override
             public void onSuccess(String response) {
                 spielerAdvancedDto.setGruppenName(response);
-                adressenMap.put(spielgruppeId, spielerAdvancedDto);
-                //runOnUiThread(() -> addCardViewsDynamically(new ArrayList<>(adressenMap.values())));
+                adressenMap.put(spielterminId, spielerAdvancedDto);
+                runOnUiThread(() ->  {
+                    if (adressenMap.size() == spieltermineList.size()) {
+                        addCardViewsDynamically(spieltermineList);
+                    }
+                });
             }
 
             @Override
