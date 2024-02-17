@@ -81,7 +81,15 @@ public class MainActivity extends AppCompatActivity {
     private void appNavigation(){
         ImageButton buttonCreate = findViewById(R.id.create);
         ImageButton buttonProfil = findViewById(R.id.profil);
+        ImageButton buttonHome = findViewById(R.id.home);
 
+        buttonHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
         buttonCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         boardgameAPI.GetGastgeberAdresse(spieltermin.getId(), new GastgeberAdresseCallback() {
             @Override
             public void onSuccess(SpielerDto response) {
-                if (response != null && response.getWohnort() != null) {
+                if (response != null) {
                     spielerAdvancedDto.setSpielerDto(response);
                     loadGruppennamen(spieltermin.getSpielgruppeId(), spielerAdvancedDto);
                 }

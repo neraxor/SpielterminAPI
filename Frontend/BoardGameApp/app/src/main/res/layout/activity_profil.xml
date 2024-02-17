@@ -5,75 +5,104 @@
     android:layout_height="match_parent"
     android:background="@color/tan">
 
-    <TextView android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/pageName"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Profil"
-        android:textColor="@color/beige"
+        android:text="Board Gamer"
+        android:textColor="@color/wheat"
+        android:textStyle="bold"
         android:textSize="30dp"
-        android:id="@+id/tvProfil"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="16dp"/>
 
-    <TextView android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Profil Name"
+    <TextView
         android:id="@+id/tvProfilName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gruppenübersicht"
         android:textColor="@color/beige"
         android:textSize="16dp"
+        android:layout_below="@id/pageName"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/tvProfil"
-        android:layout_marginTop="35dp"/>
+        android:layout_marginTop="8dp"/>
 
-    <ScrollView android:layout_width="match_parent"
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tvProfilName"
-        android:layout_above="@+id/navbar">
+        android:layout_above="@+id/newGruppenName">
 
-        <LinearLayout android:id="@+id/containerForCards"
+        <LinearLayout
+            android:id="@+id/containerForCards"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-        </LinearLayout>
+            android:orientation="vertical"/>
     </ScrollView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/navbar"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="@color/wheat"
-        android:layout_alignParentBottom="true">
+    <EditText
+        android:id="@+id/newGruppenName"
+        android:layout_width="283dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/navbar"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:hint="Gruppe erstellen"
+        app:layout_constraintEnd_toStartOf="@id/Gruppeerstellen"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <ImageButton android:id="@+id/home"
-            android:layout_width="100dp"
+    <Button
+        android:id="@+id/Gruppeerstellen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Erstellen"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="8dp"
+        android:layout_alignTop="@id/newGruppenName"
+        android:layout_alignBottom="@id/newGruppenName"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/navbar"
+            android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:backgroundTint="@color/wheat"
-            android:background="@color/black"
-            app:srcCompat="@drawable/home_icon"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/create"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:background="@color/wheat"
+            android:layout_alignParentBottom="true">
 
-        <ImageButton android:id="@+id/create"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:backgroundTint="@color/wheat"
-            android:background="@color/black"
-            app:srcCompat="@drawable/create_icon"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/home"
-            app:layout_constraintEnd_toStartOf="@+id/profil"
-            app:layout_constraintTop_toTopOf="parent"/>
+            <ImageButton android:id="@+id/home"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:backgroundTint="@color/wheat"
+                android:background="@color/black"
+                app:srcCompat="@drawable/home_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/create"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        <ImageButton android:id="@+id/profil"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:backgroundTint="@color/wheat"
-            android:background="@color/black"
-            app:srcCompat="@drawable/profil_icon"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/create"
-            app:layout_constraintTop_toTopOf="parent"/>
+            <ImageButton android:id="@+id/create"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:backgroundTint="@color/wheat"
+                android:background="@color/black"
+                app:srcCompat="@drawable/create_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/home"
+                app:layout_constraintEnd_toStartOf="@+id/profil"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageButton android:id="@+id/profil"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:backgroundTint="@color/wheat"
+                android:background="@color/black"
+                app:srcCompat="@drawable/profil_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/create"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

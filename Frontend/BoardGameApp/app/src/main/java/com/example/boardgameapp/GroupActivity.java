@@ -2,6 +2,7 @@ package com.example.boardgameapp;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,25 +16,35 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
+import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
 import com.example.boardgameapp.Callbacks.SpielterminCallback;
 import com.example.boardgameapp.DAO.BoardgameAPI;
+import com.example.boardgameapp.DTO.SpielerAdvancedDto;
+import com.example.boardgameapp.DTO.SpielerDto;
 import com.example.boardgameapp.DTO.SpielgruppeDTO;
 import com.example.boardgameapp.DTO.SpielterminDto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class GroupActivity extends AppCompatActivity {
     private SpielgruppeDTO spielgruppeDTO;
     private BoardgameAPI boardgameAPI;
+    private Map<Integer, SpielerAdvancedDto> adressenMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,29 +59,26 @@ public class GroupActivity extends AppCompatActivity {
     }
     private void LoadGruppenDaten(){
         TextView gruppenName = findViewById(R.id.gruppenName);
-        TextView gruppenNummer = findViewById(R.id.gruppenNummer);
-        gruppenNummer.setText(String.valueOf(spielgruppeDTO.getId()));
-        gruppenName.setText("DefaultName");
+        //TextView gruppenNummer = findViewById(R.id.gruppenNummer);
+        //gruppenNummer.setText(String.valueOf(spielgruppeDTO.getId()));
+        //gruppenName.setText("DefaultName");
         LoadSpieltermine(false);
     }
-    private void LoadSpieltermine(Boolean filterByDate) {
-        boardgameAPI.GetSpieltermineByGruppe(filterByDate,spielgruppeDTO.getId(), new SpielterminCallback() {
-            @Override
-            public void onSuccess(ArrayList<SpielterminDto> spielterminDto) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        addCardViewsDynamically(spielterminDto);
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-            }
-        });
-    }
     private void addCardViewsDynamically(List<SpielterminDto> spieltermineList) {
+        //header
+        TextView gruppenNummerheader = findViewById(R.id.gruppenNummer);
+        TextView gruppenNameheader = findViewById(R.id.gruppenName);
+        SpielerAdvancedDto spielerAdvancedheader = null;
+        if (!spieltermineList.isEmpty()) {;
+            spielerAdvancedheader = adressenMap.get(spieltermineList.get(0).getSpielgruppeId());
+        }
+        if (spielerAdvancedheader != null) {
+            gruppenNameheader.setText(String.valueOf(spielerAdvancedheader.getGruppenName()));
+        }else{
+                gruppenNameheader.setText("");
+        }
+        gruppenNummerheader.setText(String.valueOf(spielgruppeDTO.getId()));
+        //body
         LinearLayout container = findViewById(R.id.containerForCards);
         LayoutInflater inflater = LayoutInflater.from(this);
         for (int i = 0; i < spieltermineList.size(); i++) {
@@ -84,11 +92,22 @@ public class GroupActivity extends AppCompatActivity {
             TextView termin = cardView.findViewById(R.id.termin);
             TextView gastgeber = cardView.findViewById(R.id.gastgeber);
 
-            gruppenName.setText("DefaultName");
+            //gruppenName.setText("DefaultName");
+            gruppenName.setText(spieltermin.getGruppenName());
+            SpielerAdvancedDto spielerAdvancedDto = adressenMap.get(spieltermin.getSpielgruppeId());
+
+            SpielerDto gastgeberdto = spielerAdvancedDto.getSpielerDto();
+            gruppenName.setText(spielerAdvancedDto.getGruppenName());
+            gastgeber.setText(gastgeberdto.getVorname() + " " + gastgeberdto.getNachname());
+
             gruppenId.setText(String.valueOf(spieltermin.getSpielgruppeId()));
             ort.setText(String.valueOf(spieltermin.getGastgeberId()));
-            termin.setText(spieltermin.getTermin().toString());
-            gastgeber.setText(String.valueOf(spieltermin.getGastgeberId()));
+            LocalDateTime datum = spieltermin.getTermin();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            String formatiertesDatum = datum.format(formatter);
+            termin.setText(formatiertesDatum);
+            //termin.setText(spieltermin.getTermin().toString());
+            //gastgeber.setText(String.valueOf(spieltermin.getGastgeberId()));
 
             cardView.setOnClickListener(v -> {
                 Intent intent = new Intent(GroupActivity.this, TerminActivity.class);
@@ -102,7 +121,8 @@ public class GroupActivity extends AppCompatActivity {
     private void InvitePlayer(){
         TextView spielerName = findViewById(R.id.SpielerInvite);
         String spieler = spielerName.getText().toString();
-        if(spieler.isEmpty()){
+        if(spieler.trim().isEmpty()){
+            popUp("Gruppe", "Spielername darf nicht leer sein");
             return;
         }
         boardgameAPI.AddSpielerToSpielgruppe(spieler,spielgruppeDTO.getId());
@@ -127,9 +147,10 @@ public class GroupActivity extends AppCompatActivity {
                 try {
                     date = dateFormat.parse(datum);
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    popUp("Gruppe", "Datum konnte nicht geparst werden");
+                    return;
                 }
-                if (!datum.isEmpty()) {
+                if (!datum.trim().isEmpty()) {
                     boardgameAPI.CreateSpieltermin(spielgruppeDTO.getId(),date);
                     LoadSpieltermine(true);
                 }
@@ -166,7 +187,16 @@ public class GroupActivity extends AppCompatActivity {
     }
     private void appNavigation(){
         ImageButton buttonCreate = findViewById(R.id.create);
+        ImageButton buttonProfil = findViewById(R.id.profil);
         ImageButton buttonHome = findViewById(R.id.home);
+
+        buttonHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
         buttonCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -174,11 +204,77 @@ public class GroupActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        buttonHome.setOnClickListener(new View.OnClickListener() {
+        buttonProfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(GroupActivity.this, MainActivity.class);
+                Intent intent = new Intent(GroupActivity.this, ProfilActivity.class);
                 startActivity(intent);
+            }
+        });
+    }
+    private void LoadSpieltermine(Boolean filterByDate) {
+        boardgameAPI.GetSpieltermineByGruppe(filterByDate, spielgruppeDTO.getId(), new SpielterminCallback() {
+            @Override
+            public void onSuccess(ArrayList<SpielterminDto> spielterminDto) {
+                for (SpielterminDto spieltermin : spielterminDto) {
+                    loadAdresseForSpieltermin(spieltermin);
+                }
+                runOnUiThread(() -> addCardViewsDynamically(spielterminDto));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+            }
+        });
+    }
+
+    private void loadAdresseForSpieltermin(SpielterminDto spieltermin) {
+        SpielerAdvancedDto spielerAdvancedDto = new SpielerAdvancedDto();
+        boardgameAPI.GetGastgeberAdresse(spieltermin.getId(), new GastgeberAdresseCallback() {
+            @Override
+            public void onSuccess(SpielerDto response) {
+                if (response != null) {
+                    spielerAdvancedDto.setSpielerDto(response);
+                    loadGruppennamen(spieltermin.getSpielgruppeId(), spielerAdvancedDto);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void loadGruppennamen(int spielgruppeId, SpielerAdvancedDto spielerAdvancedDto) {
+        boardgameAPI.getSpielgruppeById(spielgruppeId, new SpielgruppeByIdCallback() {
+            @Override
+            public void onSuccess(String response) {
+                spielerAdvancedDto.setGruppenName(response);
+                adressenMap.put(spielgruppeId, spielerAdvancedDto);
+                //runOnUiThread(() -> addCardViewsDynamically(new ArrayList<>(adressenMap.values())));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d("GroupActivity", "SpielgruppeByIdCallback onFailure: " + e.getMessage());
+            }
+        });
+    }
+    public void popUp(String title ,String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(GroupActivity.this);
+                builder.setTitle(title);
+                builder.setMessage(message);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
             }
         });
     }

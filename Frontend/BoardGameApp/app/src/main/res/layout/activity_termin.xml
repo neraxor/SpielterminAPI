@@ -20,17 +20,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <TextView
+        android:id="@+id/tvGruppenname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:text="Gruppenname"
+        android:textColor="@color/beige"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPageName" />
     <TextView
         android:id="@+id/tvSpielTermin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Spieltermin: Datum und Uhrzeit"
-        android:textColor="@color/wheat"
+        android:layout_marginLeft="8dp"
+        android:textColor="@color/beige"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvPageName" />
+        app:layout_constraintTop_toBottomOf="@id/tvGruppenname" />
 
     <TextView
         android:id="@+id/tvGastgeber"
@@ -38,7 +52,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Gastgeber: Name des Gastgebers"
-        android:textColor="@color/wheat"
+        android:layout_marginLeft="8dp"
+        android:textColor="@color/beige"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,8 +64,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
         android:text="Adresse: Adresse des Gastgebers"
-        android:textColor="@color/wheat"
+        android:textColor="@color/beige"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -76,9 +92,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Teilnehmer:"
-        android:textColor="@color/wheat"
+        android:textColor="@color/beige"
         android:textSize="16sp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAdresse" />
@@ -91,118 +107,139 @@
             android:orientation="vertical"/>
 
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tvAdresse"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp">
+            <Spinner
+                android:id="@+id/abstimmungEssenSpinner"
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_marginLeft="8dp"
+                android:textColor="@color/beige"
+                android:layout_weight="1" />
 
-    <Spinner
-        android:id="@+id/abstimmungEssenSpinner"
-        android:layout_width="274dp"
-        android:layout_height="42dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginLeft="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnEssensauswahl"
-        app:layout_constraintHorizontal_bias="0.076"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scrollViewTeilnehmer" />
+            <Button
+                android:id="@+id/btnEssensauswahl"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Auswählen"
+                android:layout_marginRight="8dp"
+ />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+
+            app:layout_constraintTop_toBottomOf="@id/btnEssensauswahl"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <EditText
+                android:id="@+id/Spielvorschlag"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Spielvorschlag eingeben"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/einladungButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:text="Absenden" />
+        </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/wheat"
+            app:layout_constraintTop_toBottomOf="@id/Spielvorschlag"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <EditText
+                    android:id="@+id/Abend"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Abend bewerten"
+                    android:inputType="number" />
+
+                <EditText
+                    android:id="@+id/Essen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Essen bewerten"
+                    android:inputType="number" />
+
+                <EditText
+                    android:id="@+id/Gastgeber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Gastgeber bewerten"
+                    android:inputType="number" />
+
+                <Button
+                    android:id="@+id/BewertungSenden"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Absenden"
+                    android:layout_gravity="end" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
 
-    <Button
-        android:id="@+id/btnEssensauswahl"
-        android:layout_width="124dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:text="Auswählen"
-        app:layout_constraintStart_toEndOf="@+id/abstimmungEssenSpinner"
-        app:layout_constraintTop_toBottomOf="@+id/scrollViewTeilnehmer" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/Gastgeber"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-    <EditText
-        android:id="@+id/Spielvorschlag"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:hint="Spielvorschlag eingeben"
-        app:layout_constraintTop_toBottomOf="@id/btnEssensauswahl"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnEssensauswahl"
-        android:layout_margin="8dp"/>
+            <EditText
+                android:id="@+id/Verspätung"
+                android:layout_width="0dp"
+                android:layout_marginLeft="8dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Verspätung in Minuten"
+                android:inputType="number"
+                android:layout_marginRight="8dp" />
 
-    <Button
-        android:id="@+id/einladungButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Absenden"
-        app:layout_constraintTop_toTopOf="@id/Spielvorschlag"
-        app:layout_constraintBottom_toBottomOf="@id/Spielvorschlag"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="8dp"/>
+            <Button
+                android:id="@+id/VerspätungSenden"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:text="Absenden" />
+        </LinearLayout>
 
-    <EditText
-        android:id="@+id/Abend"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:hint="Abend bewerten"
-        android:inputType="number"
-        app:layout_constraintTop_toBottomOf="@id/Spielvorschlag"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnEssensauswahl"
-        android:layout_margin="8dp"/>
-
-    <EditText
-        android:id="@+id/Essen"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:hint="Essen bewerten"
-        android:inputType="number"
-        app:layout_constraintTop_toBottomOf="@id/Abend"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnEssensauswahl"
-        android:layout_margin="8dp"/>
-
-    <EditText
-        android:id="@+id/Gastgeber"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:hint="Gastgeber bewerten"
-        android:inputType="number"
-        app:layout_constraintTop_toBottomOf="@id/Essen"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnEssensauswahl"
-        android:layout_margin="8dp"/>
-
-    <Button
-        android:id="@+id/BewertungSenden"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Absenden"
-        app:layout_constraintTop_toTopOf="@id/Essen"
-        app:layout_constraintBottom_toBottomOf="@id/Essen"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="8dp"/>
-
-    <EditText
-        android:id="@+id/Verspätung"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:hint="Verspätung in Minuten"
-        android:inputType="number"
-        app:layout_constraintTop_toBottomOf="@id/Gastgeber"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnEssensauswahl"
-        android:layout_margin="8dp"/>
-    <Button
-        android:id="@+id/VerspätungSenden"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Absenden"
-        app:layout_constraintTop_toTopOf="@id/Verspätung"
-        app:layout_constraintBottom_toBottomOf="@id/Verspätung"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSpielvorschlaege"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
         android:maxHeight="200dp"
         app:layout_constraintTop_toBottomOf="@id/Verspätung"
         app:layout_constraintEnd_toEndOf="parent"/>

@@ -83,14 +83,22 @@ public class CreatGroup extends AppCompatActivity {
     }
 
 
-    private void appNavigation() {
-        ImageButton buttonHome = findViewById(R.id.create);
+    private void appNavigation(){
+        ImageButton buttonCreate = findViewById(R.id.create);
         ImageButton buttonProfil = findViewById(R.id.profil);
+        ImageButton buttonHome = findViewById(R.id.home);
 
         buttonHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(CreatGroup.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        buttonCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CreatGroup.this, CreatGroup.class);
                 startActivity(intent);
             }
         });

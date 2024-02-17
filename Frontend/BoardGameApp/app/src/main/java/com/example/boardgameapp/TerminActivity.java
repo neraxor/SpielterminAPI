@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,17 +23,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.boardgameapp.Callbacks.CreateAbendbewertungCallback;
 import com.example.boardgameapp.Callbacks.EssensabstimmenCallback;
+import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
 import com.example.boardgameapp.Callbacks.GetEssensrichtungCallback;
 import com.example.boardgameapp.Callbacks.GetSpielerCallback;
 import com.example.boardgameapp.Callbacks.GetSpielvorschlagCallback;
 import com.example.boardgameapp.Callbacks.NachrichtCallback;
+import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
 import com.example.boardgameapp.Callbacks.SpielvorschlagAbstimmungCallback;
 import com.example.boardgameapp.Callbacks.SpielvorschlagCallback;
 import com.example.boardgameapp.DAO.BoardgameAPI;
 import com.example.boardgameapp.DTO.Essensrichtung;
+import com.example.boardgameapp.DTO.SpielerAdvancedDto;
+import com.example.boardgameapp.DTO.SpielerDto;
 import com.example.boardgameapp.DTO.SpielterminDto;
 import com.example.boardgameapp.DTO.SpielvorschlagDto;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,7 +102,15 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
     private void appNavigation(){
         ImageButton buttonCreate = findViewById(R.id.create);
         ImageButton buttonProfil = findViewById(R.id.profil);
+        ImageButton buttonHome = findViewById(R.id.home);
 
+        buttonHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TerminActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
         buttonCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,7 +147,10 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
     private void SendSpielvorschlag(){
         TextView tvSpielvorschlag = findViewById(R.id.Spielvorschlag);
         String spielvorschlag =tvSpielvorschlag.getText().toString();
-
+        if (spielvorschlag.trim().isEmpty()){
+            popUp("Spielvorschlag", "Bitte geben Sie einen Spielvorschlag ein");
+            return;
+        }
         boardgameAPI.CreateSpielvorschlag(spieltermin.getId(),spielvorschlag,new SpielvorschlagCallback() {
             @Override
             public void onSuccess(String response) {
@@ -145,8 +164,18 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
     }
     private void SendVerspätung(){
         TextView verspätung = findViewById(R.id.Verspätung);
-        int verspätungsWert = Integer.parseInt(verspätung.getText().toString());
-
+        int verspätungsWert = 0;
+        try {
+            verspätungsWert = Integer.parseInt(verspätung.getText().toString().trim());
+        }
+        catch(NumberFormatException e){
+            popUp("Verspätung", "Bitte geben Sie eine Zahl ein");
+            return;
+        }
+        if (verspätungsWert <= 0){
+            popUp("Verspätung", "Bitte geben Sie eine Zahl ein");
+            return;
+        }
         boardgameAPI.CreateNachricht(spieltermin.getSpielgruppeId(),verspätungsWert,spieltermin.getId(),new NachrichtCallback() {
             @Override
             public void onSuccess(String response) {
@@ -159,13 +188,52 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
         });
     }
     private void setupHeadDaten(){
-        TextView adresse = findViewById(R.id.tvAdresse);
-        TextView gastgeber = findViewById(R.id.tvGastgeber);
         TextView termin = findViewById(R.id.tvSpielTermin);
+        LocalDateTime datum = spieltermin.getTermin();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        String formatiertesDatum = datum.format(formatter);
+        termin.setText(formatiertesDatum);
+        //termin.setText(spieltermin.getTermin().toString());
+        loadAdresseForSpieltermin();
+        loadGruppennamen(spieltermin.getSpielgruppeId());
+    }
 
-        adresse.setText(String.valueOf(spieltermin.getGastgeberId()));
-        gastgeber.setText(String.valueOf(spieltermin.getGastgeberId()));
-        termin.setText(spieltermin.getTermin().toString());
+    private void loadAdresseForSpieltermin() {
+        TextView gastgeber = findViewById(R.id.tvGastgeber);
+        TextView adresse = findViewById(R.id.tvAdresse);
+        boardgameAPI.GetGastgeberAdresse(spieltermin.getId(), new GastgeberAdresseCallback() {
+            @Override
+            public void onSuccess(SpielerDto response) {
+                if (response != null) {
+                    runOnUiThread(() -> {
+                        gastgeber.setText(response.getVorname()+" "+response.getNachname());
+                        adresse.setText(response.getWohnort()+" "+ response.getPlz()+" "+response.getStraße()+" "+response.getHausnummer());
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+    private void loadGruppennamen(int spielgruppeId) {
+        boardgameAPI.getSpielgruppeById(spielgruppeId, new SpielgruppeByIdCallback() {
+            TextView gruppenName = findViewById(R.id.tvGruppenname);
+            @Override
+            public void onSuccess(String response) {
+                Log.d("MainActivity", "SpielgruppeByIdCallback onSuccess: " + response);
+                if (response != null) {
+                    runOnUiThread(() -> {
+                        gruppenName.setText(response);
+                    });
+                }
+            }
+            @Override
+            public void onFailure(Exception e) {
+                Log.d("MainActivity", "SpielgruppeByIdCallback onFailure: " + e.getMessage());
+            }
+        });
     }
     private void setupAbstimmungen(){
         Button btnEssenSenden = findViewById(R.id.BewertungSenden);
@@ -203,9 +271,30 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
         TextView abend = findViewById(R.id.Abend);
         TextView essen = findViewById(R.id.Essen);
         TextView gastgeber = findViewById(R.id.Gastgeber);
-        int essenswert = Integer.parseInt(essen.getText().toString());
-        int gastgeberwert = Integer.parseInt(gastgeber.getText().toString());
-        int abendwert = Integer.parseInt(abend.getText().toString());
+        int essenswert = 0;
+        int gastgeberwert = 0;
+        int abendwert = 0;
+        try {
+            essenswert = Integer.parseInt(essen.getText().toString().trim());
+            gastgeberwert = Integer.parseInt(gastgeber.getText().toString().trim());
+            abendwert = Integer.parseInt(abend.getText().toString().trim());
+            if (essenswert < 1 || essenswert > 10) {
+                popUp("Fehler", "Bitte geben Sie für das Essen einen Wert zwischen 1 und 10 ein.");
+                return;
+            }
+            if (gastgeberwert < 1 || gastgeberwert > 10) {
+                popUp("Fehler", "Bitte geben Sie für den Gastgeber einen Wert zwischen 1 und 10 ein.");
+                return;
+            }
+            if (abendwert < 1 || abendwert > 10) {
+                popUp("Fehler", "Bitte geben Sie für den Abend einen Wert zwischen 1 und 10 ein.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            popUp("Fehler", "Bitte alle 3 Felder füllen und nur numerische Werte eingeben.");
+            return;
+        }
+
         int spielerId = boardgameAPI.getSpielerIdFromToken();
         boardgameAPI.CreateAbendbewertung(spieltermin.getId(), gastgeberwert,essenswert,abendwert,spielerId, new CreateAbendbewertungCallback() {
             @Override
@@ -239,9 +328,14 @@ public class TerminActivity extends AppCompatActivity implements SpielvorschlagA
             public void onSuccess(ArrayList<String> response) {
                 for (String spieler : response) {
                     TextView teilnehmerView = new TextView(TerminActivity.this);
-                    teilnehmerView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    int dp8 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
+                    layoutParams.setMargins(dp8, 0, 0, 0);
+                    teilnehmerView.setLayoutParams(layoutParams);
+                    //teilnehmerView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     teilnehmerView.setText(spieler);
-                    teilnehmerView.setTextColor(getResources().getColor(R.color.wheat));
+                    teilnehmerView.setTextColor(getResources().getColor(R.color.beige));
                     teilnehmerView.setTextSize(16);
                     teilnehmerListe.addView(teilnehmerView);
                 }

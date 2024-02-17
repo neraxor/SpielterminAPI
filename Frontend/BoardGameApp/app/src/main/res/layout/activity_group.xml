@@ -97,6 +97,7 @@
 
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/SpielerInvite"
@@ -117,12 +118,12 @@
         android:id="@+id/SpielerInvite"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:hint="Spieler hinzufügen"
-        app:layout_constraintTop_toBottomOf="@id/containerForCards"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/einladungButton"
         app:layout_constraintBottom_toTopOf="@id/navbar"
-        android:layout_margin="8dp"/>
+        app:layout_constraintEnd_toStartOf="@id/einladungButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
 
     <Button
         android:id="@+id/einladungButton"

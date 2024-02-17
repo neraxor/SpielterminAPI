@@ -59,12 +59,11 @@ import okhttp3.Response;
 
 public class BoardgameAPI extends AppCompatActivity {
     private Context context;
+    String localhost = "http://192.168.0.133:7063";
+
     public BoardgameAPI(Context contex) {
         this.context = contex;
     }
-    //hier folgen nun alle querys für die api
-    //die query ist immer recht ähnlich aufgebaut und entweder ein post oder ein get
-    //aktuell hab ich noch meine lokale ip angegeben, die muss dann noch geändert werden bzw in eine config
     //get
     public void GetGastgeberAdresse(int SpielterminID, GastgeberAdresseCallback callback) {
         OkHttpClient client = new OkHttpClient();
@@ -75,7 +74,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/GetGastgeberAdresse").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/GetGastgeberAdresse").newBuilder();
         urlBuilder.addQueryParameter("spielterminId", String.valueOf(SpielterminID));
         String url = urlBuilder.build().toString();
         String token = getToken();
@@ -113,7 +112,6 @@ public class BoardgameAPI extends AppCompatActivity {
             jsonObject.put("essensbewertung", essensBewertung);
             jsonObject.put("gastgeberbewertung", gastgeberBewertung);
             jsonObject.put("spielerId", spielerId);
-            // leere Daten fürs DTO
             jsonObject.put("id", 0);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -121,7 +119,7 @@ public class BoardgameAPI extends AppCompatActivity {
         String token = getToken();
         RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
         Request request = new Request.Builder()
-                .url("http://192.168.0.133:7063/api/Abendbewertung/create-abendbewertung")
+                .url(localhost+"/api/Abendbewertung/create-abendbewertung")
                 .post(body)
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -145,7 +143,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Abendbewertung/GetBewertungenByGruppe").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/api/Abendbewertung/GetBewertungenByGruppe").newBuilder();
         urlBuilder.addQueryParameter("spielgruppeId", String.valueOf(spielgruppeId));
         String url = urlBuilder.build().toString();
         String token = getToken();
@@ -183,7 +181,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Abendbewertung/GetBewertungenByTermin").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/api/Abendbewertung/GetBewertungenByTermin").newBuilder();
         urlBuilder.addQueryParameter("spielterminId", String.valueOf(spielterminId));
         String url = urlBuilder.build().toString();
         String token = getToken();
@@ -219,7 +217,6 @@ public class BoardgameAPI extends AppCompatActivity {
         try {
             jsonObject.put("spielterminId", spielterminId);
             jsonObject.put("essensrichtungId", essensrichtungId);
-            // leere Daten fürs DTO
             jsonObject.put("id", 0);
             jsonObject.put("spielerId", 0);
         } catch (JSONException e) {
@@ -228,7 +225,7 @@ public class BoardgameAPI extends AppCompatActivity {
         String token = getToken();
         RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
         Request request = new Request.Builder()
-                .url("http://192.168.0.133:7063/api/Essensabstimmung/Essenabstimmen")
+                .url(localhost+"/api/Essensabstimmung/Essenabstimmen")
                 .post(body)
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -255,7 +252,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Essensabstimmung/GetSiegerEssensrichtung").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/api/Essensabstimmung/GetSiegerEssensrichtung").newBuilder();
         urlBuilder.addQueryParameter("spielterminId", String.valueOf(spielterminId));
         String url = urlBuilder.build().toString();
         String token = getToken();
@@ -287,7 +284,7 @@ public class BoardgameAPI extends AppCompatActivity {
     // GetEssensrichtungen
     public void Essensrichtung(GetEssensrichtungCallback callback){
         OkHttpClient client = new OkHttpClient();
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Essensrichtung").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/api/Essensrichtung").newBuilder();
         String url = urlBuilder.build().toString();
         String token = getToken();
         Request request = new Request.Builder()
@@ -324,7 +321,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/GetSpieler").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/GetSpieler").newBuilder();
         urlBuilder.addQueryParameter("SpielgruppenId", String.valueOf(spielgruppeId));
         urlBuilder.addQueryParameter("SpielterminId", String.valueOf(spielterminId));
         String url = urlBuilder.build().toString();
@@ -393,7 +390,7 @@ public class BoardgameAPI extends AppCompatActivity {
         String token = getToken();
         RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
         Request request = new Request.Builder()
-                .url("http://192.168.0.133:7063/api/Nachricht/create-nachricht")
+                .url(localhost+"/api/Nachricht/create-nachricht")
                 .post(body)
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -422,7 +419,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Nachricht/get-nachrichten").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/api/Nachricht/get-nachrichten").newBuilder();
         urlBuilder.addQueryParameter("spielgruppeId", String.valueOf(spielgruppeId));
         urlBuilder.addQueryParameter("anzahlNachrichten", String.valueOf(anzahlNachrichten));
         urlBuilder.addQueryParameter("limitAnzahl", String.valueOf(limitAnzahl));
@@ -468,7 +465,7 @@ public class BoardgameAPI extends AppCompatActivity {
         String token = getToken();
         RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
         Request request = new Request.Builder()
-                .url("http://192.168.0.133:7063/api/Spielabstimmung/create-spielabstimmung")
+                .url(localhost+"/api/Spielabstimmung/create-spielabstimmung")
                 .post(body)
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -481,14 +478,14 @@ public class BoardgameAPI extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseData = response.body().string();
-                callback.onSuccess("Abstimmung gespeichert");
+                callback.onSuccess(responseData);
             }
         });
     }
     //get Spielgruppe
     public void GetSpielgruppe(ProfilCallback callback){
         OkHttpClient client = new OkHttpClient();
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Spielgruppe").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/api/Spielgruppe").newBuilder();
         String url = urlBuilder.build().toString();
         String token = getToken();
         Request request = new Request.Builder()
@@ -523,7 +520,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/GetSpielgruppeNameById").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/GetSpielgruppeNameById").newBuilder();
         urlBuilder.addQueryParameter("spielgruppeId", String.valueOf(spielgruppeId));
         String url = urlBuilder.build().toString();
         String token = getToken();
@@ -559,7 +556,7 @@ public class BoardgameAPI extends AppCompatActivity {
         String token = getToken();
         RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
         Request request = new Request.Builder()
-                .url("http://192.168.0.133:7063/api/Spielgruppe")
+                .url(localhost+"/api/Spielgruppe")
                 .post(body)
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -592,15 +589,13 @@ public class BoardgameAPI extends AppCompatActivity {
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
         try {
-            //jsonObject.put("username", username);
             jsonObject.put("spielgruppeId", spielgruppeId);
-            // leere Daten fürs DTO
         } catch (JSONException e) {
             e.printStackTrace();
         }
         String token = getToken();
         RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Spielgruppe/AddSpieler").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/api/Spielgruppe/AddSpieler").newBuilder();
         urlBuilder.addQueryParameter("username", String.valueOf(username));
         String url = urlBuilder.build().toString();
 
@@ -619,6 +614,7 @@ public class BoardgameAPI extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
+
                 }
             }
         });
@@ -633,7 +629,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/GetSpieltermineBySpieler").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/GetSpieltermineBySpieler").newBuilder();
         urlBuilder.addQueryParameter("filterByDate", String.valueOf(filterByDate));
         String url = urlBuilder.build().toString();
         String token = getToken();
@@ -674,7 +670,7 @@ public class BoardgameAPI extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/GetSpieltermineByGruppe").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/GetSpieltermineByGruppe").newBuilder();
         urlBuilder.addQueryParameter("filterByDate", String.valueOf(filterByDate));
         urlBuilder.addQueryParameter("SpielgruppenId", String.valueOf(SpielgruppenId));
         String url = urlBuilder.build().toString();
@@ -731,7 +727,7 @@ public class BoardgameAPI extends AppCompatActivity {
         String token = getToken();
         RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
         Request request = new Request.Builder()
-                .url("http://192.168.0.133:7063/api/Spieltermin/create-spieltermin")
+                .url(localhost+"/api/Spieltermin/create-spieltermin")
                 .post(body)
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -758,7 +754,6 @@ public class BoardgameAPI extends AppCompatActivity {
         try {
             jsonObject.put("spielterminId", spielterminId);
             jsonObject.put("spielvorschlagName", spielvorschlagName);
-            // leere Daten fürs DTO
             jsonObject.put("spielerId", 0);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -766,7 +761,7 @@ public class BoardgameAPI extends AppCompatActivity {
         String token = getToken();
         RequestBody body = RequestBody.Companion.create(jsonObject.toString(), JSON);
         Request request = new Request.Builder()
-                .url("http://192.168.0.133:7063/api/Spielvorschlag/create-spielvorschlag")
+                .url(localhost+"/api/Spielvorschlag/create-spielvorschlag")
                 .post(body)
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -786,7 +781,7 @@ public class BoardgameAPI extends AppCompatActivity {
     }
     public void getSpielvorschlag(int spielterminId, GetSpielvorschlagCallback callback){
         OkHttpClient client = new OkHttpClient();
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://192.168.0.133:7063/api/Spielvorschlag/get-spielvorschlag").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(localhost+"/api/Spielvorschlag/get-spielvorschlag").newBuilder();
         urlBuilder.addQueryParameter("SpielterminId", String.valueOf(spielterminId));
         String url = urlBuilder.build().toString();
         String token = getToken();
@@ -844,4 +839,5 @@ public class BoardgameAPI extends AppCompatActivity {
         }
         return null;
     }
+
 }

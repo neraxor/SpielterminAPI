@@ -22,15 +22,6 @@
                 android:layout_marginBottom="15dp"
         />
         <TextView
-            android:id="@+id/spieler"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Spieler:"
-            android:textColor="@color/black"
-            android:layout_marginTop="35dp"
-            android:layout_marginBottom="15dp"
-            />
-        <TextView
                 android:id="@+id/gruppenName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
