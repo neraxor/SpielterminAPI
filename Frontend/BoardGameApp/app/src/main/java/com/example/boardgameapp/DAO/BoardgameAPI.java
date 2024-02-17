@@ -29,7 +29,6 @@ import com.example.boardgameapp.DTO.SpielgruppeDTO;
 import com.example.boardgameapp.DTO.SpielterminDto;
 import com.example.boardgameapp.DTO.SpielvorschlagDto;
 import com.example.boardgameapp.GsonUtil;
-import com.example.boardgameapp.modul.Spielgruppe;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -584,7 +583,7 @@ public class BoardgameAPI extends AppCompatActivity {
         return spielgruppeDTO;
     }
     //post AddSpieler
-    public void AddSpielerToSpielgruppe(String username, int spielgruppeId){
+    public void AddSpielerToSpielgruppe(String username, int spielgruppeId, CreateAbendbewertungCallback callback){
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         JSONObject jsonObject = new JSONObject();
@@ -612,9 +611,13 @@ public class BoardgameAPI extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-
+                String responseData = response.body().string();
+                if (response.isSuccessful())
+                {
+                    callback.onSuccess("Spieler wurde hinzugefügt");
+                }
+                else{
+                    callback.onSuccess(responseData);
                 }
             }
         });

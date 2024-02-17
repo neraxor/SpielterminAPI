@@ -19,6 +19,8 @@ import android.widget.TimePicker;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.boardgameapp.Callbacks.CreateAbendbewertungCallback;
+import com.example.boardgameapp.Callbacks.CreateSpielgruppeCallback;
 import com.example.boardgameapp.Callbacks.GastgeberAdresseCallback;
 import com.example.boardgameapp.Callbacks.SpielgruppeByIdCallback;
 import com.example.boardgameapp.Callbacks.SpielterminCallback;
@@ -96,9 +98,14 @@ public class GroupActivity extends AppCompatActivity {
             gruppenName.setText(spieltermin.getGruppenName());
             SpielerAdvancedDto spielerAdvancedDto = adressenMap.get(spieltermin.getSpielgruppeId());
 
-            SpielerDto gastgeberdto = spielerAdvancedDto.getSpielerDto();
-            gruppenName.setText(spielerAdvancedDto.getGruppenName());
-            gastgeber.setText(gastgeberdto.getVorname() + " " + gastgeberdto.getNachname());
+            if (spielerAdvancedDto != null) {
+                SpielerDto gastgeberdto = spielerAdvancedDto.getSpielerDto();
+                gruppenName.setText(spielerAdvancedDto.getGruppenName());
+                gastgeber.setText(gastgeberdto.getVorname() + " " + gastgeberdto.getNachname());
+            } else {
+                gruppenName.setText("");
+                gastgeber.setText("");
+            }
 
             gruppenId.setText(String.valueOf(spieltermin.getSpielgruppeId()));
             ort.setText(String.valueOf(spieltermin.getGastgeberId()));
@@ -125,7 +132,17 @@ public class GroupActivity extends AppCompatActivity {
             popUp("Gruppe", "Spielername darf nicht leer sein");
             return;
         }
-        boardgameAPI.AddSpielerToSpielgruppe(spieler,spielgruppeDTO.getId());
+        boardgameAPI.AddSpielerToSpielgruppe(spieler,spielgruppeDTO.getId(),new CreateAbendbewertungCallback() {
+            @Override
+            public void onSuccess(String response) {
+                popUp("Gruppe", response);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                popUp("Gruppe", "Spieler konnte nicht eingeladen werden");
+            }
+        });
     }
     private void InitializeDatetimePicker(){
         Button einladungsButton = findViewById(R.id.einladungButton);

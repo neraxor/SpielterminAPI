@@ -90,6 +90,15 @@ namespace SpielterminApi.Controllers
             {
                 return BadRequest("Benutzer wurde nicht gefunden");
             }
+            if (user.ID == _userService.GetSpielerId())
+            {
+                return BadRequest("Spieler kann sich nicht selbst hinzufügen");
+            }
+            var spielerInGruppe = await _context.SpielgruppeSpieler.AnyAsync(x => x.SpielgruppeId == dto.SpielgruppeId && x.SpielerId == user.ID);
+            if (spielerInGruppe)
+            {
+                return BadRequest("Spieler ist bereits in der Spielgruppe");
+            }
             var spielgruppeSpieler = new SpielgruppeSpieler
             {
                 SpielgruppeId = dto.SpielgruppeId,
