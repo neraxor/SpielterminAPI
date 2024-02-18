@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         appNavigation();
         boardgameAPI = new BoardgameAPI(this);
-        LoadSpieltermine(false);
+        LoadSpieltermine(true);
     }
     private Map<Integer, SpielerAdvancedDto> adressenMap = new HashMap<>();
 
@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void appNavigation(){
-        ImageButton buttonCreate = findViewById(R.id.create);
         ImageButton buttonProfil = findViewById(R.id.profil);
         ImageButton buttonHome = findViewById(R.id.home);
 
@@ -87,13 +86,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-        buttonCreate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, CreatGroup.class);
                 startActivity(intent);
             }
         });

@@ -112,7 +112,6 @@ public class TerminActivity extends AppCompatActivity implements BasicCallback {
     }
 
     private void appNavigation(){
-        ImageButton buttonCreate = findViewById(R.id.create);
         ImageButton buttonProfil = findViewById(R.id.profil);
         ImageButton buttonHome = findViewById(R.id.home);
 
@@ -120,13 +119,6 @@ public class TerminActivity extends AppCompatActivity implements BasicCallback {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TerminActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-        buttonCreate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(TerminActivity.this, CreatGroup.class);
                 startActivity(intent);
             }
         });

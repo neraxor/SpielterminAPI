@@ -163,7 +163,8 @@ public class GroupActivity extends AppCompatActivity {
                 }
                 if (!datum.trim().isEmpty()) {
                     boardgameAPI.CreateSpieltermin(spielgruppeDTO.getId(),date);
-                    LoadSpieltermine(true);
+                    popUp("Gruppe", "Der Spieltermin wurde erstellt");
+                    //LoadSpieltermine(true);
                 }
             }
         });
@@ -197,7 +198,6 @@ public class GroupActivity extends AppCompatActivity {
         });
     }
     private void appNavigation(){
-        ImageButton buttonCreate = findViewById(R.id.create);
         ImageButton buttonProfil = findViewById(R.id.profil);
         ImageButton buttonHome = findViewById(R.id.home);
 
@@ -205,13 +205,6 @@ public class GroupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(GroupActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-        buttonCreate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(GroupActivity.this, CreatGroup.class);
                 startActivity(intent);
             }
         });
